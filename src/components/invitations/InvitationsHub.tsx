@@ -202,13 +202,13 @@ export const InvitationsHub: React.FC<InvitationsHubProps> = ({ onOpenGuestRsvp 
                 WhatsApp Invitation Engine
               </span>
               <span className="text-[11px] text-[#8C7A70]">·</span>
-              <span className="text-[11px] text-[#5C4D43] font-medium">Meta Click-to-Chat</span>
+              <span className="text-[11px] text-[#5C4D43] font-medium">Direct Click-to-Chat (wa.me)</span>
             </div>
             <h2 className="font-serif-luxury text-xl sm:text-2xl font-bold text-[#800020]">
               Invitations & Sharing Tracker
             </h2>
             <p className="text-xs text-[#6B5E55] mt-0.5">
-              Send personalized WhatsApp digital invitation passes, track dispatch progress, and prevent food wastage.
+              Send personalized WhatsApp invitations directly via <code className="font-mono text-[#800020]">wa.me</code> without any Meta account or tokens.
             </p>
           </div>
         </div>
@@ -553,7 +553,7 @@ export const InvitationsHub: React.FC<InvitationsHubProps> = ({ onOpenGuestRsvp 
             <strong className="text-[#800020]">Zero-Waste Food Assurance:</strong> When guests open their link and submit headcount, their confirmed responses instantly synchronize with the Food Planning calculator.
           </p>
           <p className="text-[11px] text-[#786C64]">
-            WhatsApp click-to-chat complies with Meta's official web linking protocols (<code className="font-mono text-[#800020]">https://wa.me/&lt;phone&gt;?text=&lt;encoded&gt;</code>). Opening the link does not automatically mark the invitation as delivered until you verify it or the guest confirms RSVP.
+            WhatsApp Click-to-Chat uses the standard web linking protocol (<code className="font-mono text-[#800020]">https://wa.me/&lt;phone&gt;?text=&lt;encoded&gt;</code>) directly from your device. No Facebook account, Meta app, or API keys are required. Opening WhatsApp opens the conversation ready for you to press Send—it never pretends the message is sent until you explicitly mark it or receive an RSVP.
           </p>
         </div>
       </div>

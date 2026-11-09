@@ -14,40 +14,39 @@ const port = parseInt(process.env.PORT || '3000', 10);
 app.use(express.json());
 
 // ==========================================
-// WHATSAPP BUSINESS CLOUD API INTEGRATION
+// WHATSAPP INTEGRATION: CLICK-TO-CHAT (ZERO CREDENTIALS NEEDED)
 // ==========================================
 
+// Meta WhatsApp Cloud API credentials are 100% OPTIONAL.
+// No Facebook account or Meta developer credentials required.
+// WhatsApp Click-to-Chat (https://wa.me/) is the primary, zero-setup protocol.
 const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || process.env.META_WHATSAPP_ACCESS_TOKEN || '';
 const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
 const WHATSAPP_BUSINESS_ACCOUNT_ID = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID || '';
-const WHATSAPP_WEBHOOK_VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'weddingguest_meta_webhook_token';
+const WHATSAPP_WEBHOOK_VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || '';
 
-// In-memory log of webhook delivery updates for quick status queries
+// In-memory log of webhook delivery updates for quick status queries (if configured)
 const webhookDeliveryLogs: Record<string, { status: string; timestamp: string; recipientId: string }> = {};
 
 /**
- * Check whether Meta WhatsApp Cloud API credentials are fully configured.
- * Never exposes the actual secret token.
+ * WhatsApp configuration status.
+ * WhatsApp Click-to-Chat (wa.me) is fully enabled with ZERO credentials or Facebook accounts required.
  */
 app.get('/api/whatsapp/config', (_req: Request, res: Response) => {
-  const missingKeys: string[] = [];
-  if (!WHATSAPP_ACCESS_TOKEN) missingKeys.push('WHATSAPP_ACCESS_TOKEN');
-  if (!WHATSAPP_PHONE_NUMBER_ID) missingKeys.push('WHATSAPP_PHONE_NUMBER_ID');
-  if (!WHATSAPP_BUSINESS_ACCOUNT_ID) missingKeys.push('WHATSAPP_BUSINESS_ACCOUNT_ID');
-
   res.json({
-    configured: missingKeys.length === 0,
-    missingKeys,
-    phoneNumberId: WHATSAPP_PHONE_NUMBER_ID ? `${WHATSAPP_PHONE_NUMBER_ID.slice(0, 4)}...${WHATSAPP_PHONE_NUMBER_ID.slice(-4)}` : null,
-    businessAccountId: WHATSAPP_BUSINESS_ACCOUNT_ID ? `${WHATSAPP_BUSINESS_ACCOUNT_ID.slice(0, 4)}...` : null,
-    provider: 'Meta WhatsApp Cloud API v19.0',
-    clickToChatFallbackAvailable: true,
+    mode: 'click_to_chat',
+    clickToChatEnabled: true,
+    requiresCredentials: false,
+    requiresMetaAccount: false,
+    optionalCloudApiConfigured: Boolean(WHATSAPP_ACCESS_TOKEN && WHATSAPP_PHONE_NUMBER_ID),
+    protocol: 'https://wa.me/<phone>?text=<encoded_invitation>',
+    info: 'WhatsApp Click-to-Chat operates directly from host device/browser with no Facebook or Meta API keys.',
   });
 });
 
 /**
- * Automated message sender using Meta WhatsApp Business Cloud API.
- * Accepts: { recipientPhone, templateName, templateLanguage, components, guestId, invitationId, weddingId }
+ * Automated message sender or Click-to-Chat URL generator.
+ * If Meta credentials are not present, seamlessly generates Click-to-Chat URL.
  */
 app.post('/api/whatsapp/send', async (req: Request, res: Response) => {
   try {
@@ -62,18 +61,23 @@ app.post('/api/whatsapp/send', async (req: Request, res: Response) => {
       invitationUrl,
     } = req.body;
 
-    // 1. Check if Meta API credentials exist
+    const cleanPhone = String(recipientPhone || '').replace(/[^0-9]/g, '');
+    const message = bodyText || `Hello ${guestName || ''}! You are warmly invited to our wedding celebration. RSVP here: ${invitationUrl || ''}`;
+    const clickToChatUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+
+    // If Meta Cloud API is not configured, gracefully return the Click-to-Chat URL
     if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
-      return res.status(400).json({
-        success: false,
-        error: 'Meta WhatsApp Cloud API is not configured on this server. Please use Click-to-Chat or configure WHATSAPP_ACCESS_TOKEN and WHATSAPP_PHONE_NUMBER_ID.',
-        configured: false,
+      return res.json({
+        success: true,
+        method: 'click_to_chat',
+        clickToChatUrl,
+        recipientPhone: cleanPhone,
+        message: 'Click-to-chat ready. Host can open chat and press send.',
       });
     }
 
-    // 2. Clean phone number
-    const cleanPhone = String(recipientPhone || '').replace(/[^0-9]/g, '');
-    if (!cleanPhone || cleanPhone.length < 10 || cleanPhone.length > 15) {
+    // Validate phone number length
+    if (cleanPhone.length < 10 || cleanPhone.length > 15) {
       return res.status(400).json({
         success: false,
         error: 'Invalid recipient phone number. Must be valid international format (digits only, e.g. 919876543210).',

@@ -864,9 +864,7 @@ export const WeddingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const formatPersonalizedWhatsAppMessage = (guest: Guest, customTemplate?: string): string => {
-    const invitation = getGuestInvitation(guest.guestId);
-    const token = invitation?.uniqueToken || '';
-    const rsvpUrl = `${window.location.origin}/?rsvp=${token}`;
+    const rsvpUrl = getInvitationUrlForGuest(guest.guestId);
     const defaultTemplate = 
 `Namaste {guestName}! 🙏
 
@@ -894,13 +892,12 @@ With love & respect,
       .replace(/{weddingTime}/g, currentWedding.weddingTime)
       .replace(/{venue}/g, currentWedding.venue)
       .replace(/{venueAddress}/g, currentWedding.venueAddress)
-      .replace(/{rsvpUrl}/g, rsvpUrl);
+      .replace(/{rsvpUrl}/g, rsvpUrl)
+      .replace(/{invitationUrl}/g, rsvpUrl);
   };
 
   const formatPersonalizedReminderMessage = (guest: Guest, customTemplate?: string): string => {
-    const invitation = getGuestInvitation(guest.guestId);
-    const token = invitation?.uniqueToken || '';
-    const rsvpUrl = `${window.location.origin}/?rsvp=${token}`;
+    const rsvpUrl = getInvitationUrlForGuest(guest.guestId);
     const defaultReminder = 
 `Namaste {guestName}! 🙏
 
@@ -924,20 +921,80 @@ With warm regards,
       .replace(/{weddingTime}/g, currentWedding.weddingTime)
       .replace(/{venue}/g, currentWedding.venue)
       .replace(/{venueAddress}/g, currentWedding.venueAddress)
-      .replace(/{rsvpUrl}/g, rsvpUrl);
+      .replace(/{rsvpUrl}/g, rsvpUrl)
+      .replace(/{invitationUrl}/g, rsvpUrl);
   };
 
-  // WhatsApp Link Pre-filler (Follows Meta Click-to-Chat)
+  // WhatsApp Link Generator (Direct Click-to-Chat: https://wa.me/)
   const generateWhatsAppLink = (guest: Guest, customMsgTemplate?: string): string => {
     const message = formatPersonalizedWhatsAppMessage(guest, customMsgTemplate);
-    const cleanPhone = `${guest.countryCode || '+91'}${guest.phone}`.replace(/[^0-9]/g, '');
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    const chat = generateWhatsAppClickToChatLink(guest.phone, guest.countryCode, message);
+    if (chat.isValid && chat.link) {
+      return chat.link;
+    }
+    const cleanDigits = `${(guest.countryCode || '+91').replace(/[^0-9]/g, '')}${(guest.phone || '').replace(/[^0-9]/g, '')}`;
+    return `https://wa.me/${cleanDigits}?text=${encodeURIComponent(message)}`;
   };
 
   const generateReminderWhatsAppLink = (guest: Guest, customReminderTemplate?: string): string => {
     const message = formatPersonalizedReminderMessage(guest, customReminderTemplate);
-    const cleanPhone = `${guest.countryCode || '+91'}${guest.phone}`.replace(/[^0-9]/g, '');
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    const chat = generateWhatsAppClickToChatLink(guest.phone, guest.countryCode, message);
+    if (chat.isValid && chat.link) {
+      return chat.link;
+    }
+    const cleanDigits = `${(guest.countryCode || '+91').replace(/[^0-9]/g, '')}${(guest.phone || '').replace(/[^0-9]/g, '')}`;
+    return `https://wa.me/${cleanDigits}?text=${encodeURIComponent(message)}`;
+  };
+
+  const getInvitationUrlForGuest = (guestId: string): string => {
+    const inv = getGuestInvitation(guestId);
+    if (inv?.uniqueToken) {
+      return getInvitationUrl(inv.uniqueToken);
+    }
+    return getInvitationUrl(`tok_${guestId}`);
+  };
+
+  const validateGuestWhatsAppNumber = (
+    guest: Guest
+  ): { cleanNumber: string; isValid: boolean; formattedDisplay: string; error?: string } => {
+    return formatWhatsAppPhoneNumber(guest.phone, guest.countryCode);
+  };
+
+  const resolveGuestInvitationAsync = async (
+    token: string
+  ): Promise<{ guest: Guest; invitation: GuestInvitation; wedding: Wedding } | null> => {
+    const local = getGuestByToken(token);
+    if (local) return local;
+
+    try {
+      const record = await getInvitationTokenRecord(token);
+      if (record) {
+        const wedding = (await getWeddingFromFirestore(record.weddingId)) || currentWedding;
+        const guest = (await getGuestFromFirestore(record.weddingId, record.guestId)) || {
+          guestId: record.guestId,
+          weddingId: record.weddingId,
+          name: record.guestName,
+          phone: record.phone,
+          countryCode: '+91',
+          familyName: record.familyName,
+          category: (record.category as any) || 'Friends',
+          expectedMembers: record.expectedMembers || 2,
+          createdAt: record.createdAt,
+        };
+        const invitation: GuestInvitation = {
+          invitationId: `inv_${record.token}`,
+          guestId: record.guestId,
+          weddingId: record.weddingId,
+          uniqueToken: record.token,
+          sharingStatus: record.status || 'not_sent',
+          createdAt: record.createdAt,
+        };
+        return { guest, invitation, wedding };
+      }
+    } catch (e) {
+      console.warn('Error resolving token async:', e);
+    }
+    return null;
   };
 
   const getGuestRSVP = (guestId: string, targetEventId?: string): EventRSVP | undefined => {
@@ -1104,12 +1161,15 @@ With warm regards,
         bulkAddGuests,
         getGuestInvitation,
         getGuestByToken,
+        resolveGuestInvitationAsync,
+        getInvitationUrlForGuest,
         updateInvitationStatus,
         toggleInvitationMarkedSent,
         formatPersonalizedWhatsAppMessage,
         formatPersonalizedReminderMessage,
         generateWhatsAppLink,
         generateReminderWhatsAppLink,
+        validateGuestWhatsAppNumber,
         getGuestRSVP,
         submitGuestRSVP,
         submitMultiEventRSVP,

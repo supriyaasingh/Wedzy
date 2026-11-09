@@ -41,7 +41,7 @@ export function getBaseAppUrl(): string {
  */
 export function getInvitationUrl(token: string): string {
   const baseUrl = getBaseAppUrl();
-  return `${baseUrl}/invitation/${encodeURIComponent(token.trim())}`;
+  return `${baseUrl}/?rsvp=${encodeURIComponent(token.trim())}`;
 }
 
 /**
@@ -265,26 +265,43 @@ Thank you!`;
  * Generates official WhatsApp Click-to-Chat URL
  * Format: https://wa.me/919876543210?text=ENCODED_MESSAGE
  */
-export function generateWhatsAppClickToChatLink(phone: string, countryCode: string, message: string): {
+export function generateWhatsAppClickToChatLink(phone: string, countryCode: string = '+91', message: string): {
   link: string;
   cleanPhone: string;
   isValid: boolean;
   error?: string;
 } {
   const parsed = formatWhatsAppPhoneNumber(phone, countryCode);
-  if (!parsed.isValid) {
+  const encoded = encodeURIComponent(message);
+
+  if (parsed.isValid && parsed.cleanNumber) {
     return {
-      link: '',
+      link: `https://wa.me/${parsed.cleanNumber}?text=${encoded}`,
       cleanPhone: parsed.cleanNumber,
-      isValid: false,
-      error: parsed.error,
+      isValid: true,
     };
   }
 
-  const encoded = encodeURIComponent(message);
+  // Resilient fallback: strip non-digits and ensure country code
+  const digits = String(phone || '').replace(/[^0-9]/g, '');
+  const codeDigits = String(countryCode || '+91').replace(/[^0-9]/g, '') || '91';
+  let fallbackPhone = digits;
+  if (digits && !digits.startsWith(codeDigits)) {
+    fallbackPhone = `${codeDigits}${digits}`;
+  }
+
+  if (fallbackPhone.length >= 8) {
+    return {
+      link: `https://wa.me/${fallbackPhone}?text=${encoded}`,
+      cleanPhone: fallbackPhone,
+      isValid: true,
+    };
+  }
+
   return {
-    link: `https://wa.me/${parsed.cleanNumber}?text=${encoded}`,
-    cleanPhone: parsed.cleanNumber,
-    isValid: true,
+    link: '',
+    cleanPhone: parsed.cleanNumber || digits,
+    isValid: false,
+    error: parsed.error || 'Invalid phone number for WhatsApp Click-to-Chat',
   };
 }

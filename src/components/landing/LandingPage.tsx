@@ -544,7 +544,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="lg:col-span-6 space-y-5">
               <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#25D366] bg-[#075E54] px-3 py-1 rounded-md">
                 <MessageCircle className="w-3.5 h-3.5" />
-                <span>Meta WhatsApp Click-to-Chat</span>
+                <span>Direct WhatsApp Click-to-Chat (wa.me)</span>
               </div>
 
               <h2 className="font-display text-2xl sm:text-4xl font-bold text-[#800020]">

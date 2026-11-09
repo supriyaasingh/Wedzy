@@ -11,6 +11,7 @@ import { AuthModal } from './components/auth/AuthModal';
 import { UserProfileModal } from './components/auth/UserProfileModal';
 import { OfflineIndicator } from './components/pwa/OfflineIndicator';
 import { Guest } from './types/wedding';
+import { parseInvitationTokenFromUrl } from './utils/urlHelper';
 import { ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
 
 function WeddingGuestApp() {
@@ -23,13 +24,12 @@ function WeddingGuestApp() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedGuestForRsvp, setSelectedGuestForRsvp] = useState<Guest | undefined>(undefined);
 
-  // Check URL token (e.g. ?rsvp=tok_sharma_9811)
+  // Check URL token (e.g. ?rsvp=tok_sharma_9811 or /invitation/tok_sharma_9811)
   const [urlToken, setUrlToken] = useState<string | null>(null);
   const [tokenGuestData, setTokenGuestData] = useState<ReturnType<typeof getGuestByToken>>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('rsvp');
+    const token = parseInvitationTokenFromUrl();
     if (token) {
       setUrlToken(token);
       const data = getGuestByToken(token);

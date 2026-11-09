@@ -102,9 +102,17 @@ export const BatchDispatchModal: React.FC<BatchDispatchModalProps> = ({
     toggleInvitationMarkedSent(currentGuest.guestId);
   };
 
-  const handleSendAndNext = () => {
+  // Open WhatsApp chat without falsely marking as sent, then advance to next guest
+  const handleOpenAndNext = () => {
     handleOpenWhatsApp();
-    if (!isMarkedSent && currentGuest) {
+    if (safeIndex < queueGuests.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    }
+  };
+
+  // Explicitly confirm the message was sent in WhatsApp, then advance
+  const handleMarkSentAndNext = () => {
+    if (currentGuest && !isMarkedSent) {
       toggleInvitationMarkedSent(currentGuest.guestId);
     }
     if (safeIndex < queueGuests.length - 1) {
@@ -336,16 +344,19 @@ export const BatchDispatchModal: React.FC<BatchDispatchModalProps> = ({
                   <button
                     onClick={handleOpenWhatsApp}
                     className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold text-white bg-[#075E54] hover:bg-[#128C7E] rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-all"
+                    title="Open WhatsApp chat with pre-filled invitation text"
                   >
                     <MessageCircle className="w-4 h-4 text-[#25D366]" />
                     <span>Open in WhatsApp</span>
                   </button>
 
                   <button
-                    onClick={handleSendAndNext}
+                    onClick={handleMarkSentAndNext}
                     className="flex-1 sm:flex-none px-5 py-2 text-xs font-bold text-white bg-gradient-to-r from-[#800020] to-[#990000] hover:from-[#6B081B] hover:to-[#800020] rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-all"
+                    title="Confirm you pressed Send in WhatsApp and advance to the next guest"
                   >
-                    <span>Send & Next →</span>
+                    <Check className="w-3.5 h-3.5 text-[#FDE047]" />
+                    <span>Mark Sent & Next →</span>
                   </button>
                 </div>
 
@@ -358,11 +369,11 @@ export const BatchDispatchModal: React.FC<BatchDispatchModalProps> = ({
         {/* Footer */}
         <div className="bg-white px-6 py-3 border-t border-[#E5C378]/50 flex items-center justify-between text-xs text-[#5C4D43] shrink-0">
           <span>
-            Clicking "Open in WhatsApp" opens WhatsApp Web / App directly to this guest's chat with their personalized link.
+            Clicking "Open in WhatsApp" opens WhatsApp Web or App with the pre-filled message. Since WhatsApp cannot notify external websites when you press Send, use "Mark as Sent" once delivered.
           </span>
           <button
             onClick={onClose}
-            className="px-3 py-1 font-semibold text-[#800020] hover:underline"
+            className="px-3 py-1 font-semibold text-[#800020] hover:underline shrink-0"
           >
             Close Queue
           </button>
