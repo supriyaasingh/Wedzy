@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-display: 'Cinzel Decorative', 'Cinzel', serif;
+    --font-serif-luxury: 'Playfair Display', 'Cormorant Garamond', serif;
+    --font-script: 'Great Vibes', cursive;
+    --font-traditional: 'Rozha One', 'Cinzel', serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #2C1810;
+    background-color: #FAF7F2;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Typography Helpers */
+.font-display {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+}
+
+.font-serif-luxury {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-script {
+  font-family: 'Great Vibes', cursive;
+}
+
+.font-traditional {
+  font-family: 'Rozha One', 'Cinzel', serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+/* Indian Wedding Gold & Royal Accents */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 25%, #F59E0B 50%, #B45309 75%, #92400E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border {
+  border-color: #E5C378;
+}
+
+.gold-foil-bg {
+  background: linear-gradient(135deg, #FDF7E7 0%, #FAF0D4 50%, #F5E3B5 100%);
+}
+
+.royal-maroon-bg {
+  background: linear-gradient(145deg, #7A0A20 0%, #5B0616 100%);
+}
+
+.royal-blue-bg {
+  background: linear-gradient(145deg, #0F2C59 0%, #071936 100%);
+}
+
+/* Subtle Floating Animations for Petals & Lights */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(4deg);
+  }
+}
+
+@keyframes sway-gentle {
+  0%, 100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.04);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+.animate-sway {
+  animation: sway-gentle 5s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: pulse-glow 3.5s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B45309;
+}

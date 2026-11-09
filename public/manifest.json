@@ -1,0 +1,39 @@
+{
+  "id": "/",
+  "name": "WeddingGuest — Smart Indian Wedding Invitation, RSVP & Guest Management",
+  "short_name": "WeddingGuest",
+  "description": "Smart Indian Wedding Invitation, RSVP & Guest Management Platform with zero-friction WhatsApp links, dynamic attendance breakdown, and food waste reduction.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FAF7F2",
+  "theme_color": "#800020",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/aistudio/image_462bf99c.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/aistudio/image_462bf99c.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/aistudio/image_462bf99c.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["lifestyle", "events", "utilities"]
+}

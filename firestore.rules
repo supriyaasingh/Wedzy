@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default Deny Catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Host user profile
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isOwner(userId) && request.resource.data.userId == userId;
+      allow delete: if isOwner(userId);
+    }
+
+    // Wedding Records
+    match /weddings/{weddingId} {
+      // Public read for digital invitations, host write
+      allow get: if true;
+      allow list: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.ownerId == request.auth.uid && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+
+      // Events Subcollection
+      match /events/{eventId} {
+        allow read: if true;
+        allow write: if isSignedIn() && get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerId == request.auth.uid;
+      }
+
+      // Guests Subcollection (Private list to host; single document get allowed for personalized invitation card)
+      match /guests/{guestId} {
+        allow get: if true;
+        allow list: if isSignedIn() && get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerId == request.auth.uid;
+        allow write: if isSignedIn() && get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerId == request.auth.uid;
+      }
+
+      // Invitations Subcollection
+      match /invitations/{invitationId} {
+        allow read: if true;
+        allow write: if true;
+      }
+
+      // RSVPs Subcollection (Guests can submit & update without login)
+      match /rsvps/{rsvpId} {
+        allow read: if true;
+        allow create, update: if true;
+        allow delete: if isSignedIn() && get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerId == request.auth.uid;
+      }
+    }
+
+    // Direct token lookup index (Zero-friction invitation access without exposing full guest roster)
+    match /invitation_tokens/{token} {
+      allow get: if true;
+      allow list: if false; // Prevents directory scraping of invitations
+      allow write: if true;
+    }
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered wedding host profile",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "name", "email", "createdAt"]
+    },
+    "Wedding": {
+      "title": "Wedding",
+      "description": "Wedding celebration details owned by a host",
+      "type": "object",
+      "properties": {
+        "weddingId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "brideName": { "type": "string", "maxLength": 100 },
+        "groomName": { "type": "string", "maxLength": 100 },
+        "brideFamilyName": { "type": "string", "maxLength": 100 },
+        "groomFamilyName": { "type": "string", "maxLength": 100 },
+        "weddingDate": { "type": "string" },
+        "weddingTime": { "type": "string" },
+        "venue": { "type": "string", "maxLength": 200 },
+        "venueAddress": { "type": "string", "maxLength": 500 },
+        "googleMapsUrl": { "type": "string", "maxLength": 500 },
+        "rsvpDeadline": { "type": "string" },
+        "contactPhone": { "type": "string", "maxLength": 30 },
+        "contactEmail": { "type": "string", "maxLength": 150 },
+        "theme": { "type": "string", "maxLength": 50 },
+        "invitationMessage": { "type": "string", "maxLength": 1000 },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["weddingId", "ownerId", "brideName", "groomName", "weddingDate", "venue", "rsvpDeadline", "createdAt"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Specific wedding ceremony such as Haldi, Mehendi, Sangeet, Wedding, or Reception",
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string" },
+        "weddingId": { "type": "string" },
+        "eventName": { "type": "string", "maxLength": 100 },
+        "eventDate": { "type": "string" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "venue": { "type": "string", "maxLength": 200 },
+        "dressCode": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 },
+        "separateRsvp": { "type": "boolean" },
+        "requiredFoodCount": { "type": "boolean" }
+      },
+      "required": ["eventId", "weddingId", "eventName", "eventDate", "startTime", "venue"]
+    },
+    "Guest": {
+      "title": "Guest",
+      "description": "Invited wedding guest or family unit",
+      "type": "object",
+      "properties": {
+        "guestId": { "type": "string" },
+        "weddingId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "countryCode": { "type": "string", "maxLength": 10 },
+        "email": { "type": "string", "maxLength": 150 },
+        "familyName": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "expectedMembers": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["guestId", "weddingId", "name", "phone", "expectedMembers"]
+    },
+    "Invitation": {
+      "title": "Invitation",
+      "description": "Unique tokenized invitation record for a guest",
+      "type": "object",
+      "properties": {
+        "invitationId": { "type": "string" },
+        "guestId": { "type": "string" },
+        "weddingId": { "type": "string" },
+        "uniqueToken": { "type": "string", "maxLength": 100 },
+        "sharingStatus": { "type": "string", "maxLength": 40 },
+        "lastOpenedAt": { "type": "string" },
+        "markedSentAt": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["invitationId", "guestId", "weddingId", "uniqueToken", "sharingStatus"]
+    },
+    "RSVP": {
+      "title": "RSVP",
+      "description": "Guest attendance confirmation for a ceremony",
+      "type": "object",
+      "properties": {
+        "rsvpId": { "type": "string" },
+        "guestId": { "type": "string" },
+        "eventId": { "type": "string" },
+        "weddingId": { "type": "string" },
+        "attendanceStatus": { "type": "string", "maxLength": 30 },
+        "adultCount": { "type": "number" },
+        "childCount": { "type": "number" },
+        "totalAttendees": { "type": "number" },
+        "dietaryRequirements": { "type": "string", "maxLength": 200 },
+        "additionalMessage": { "type": "string", "maxLength": 500 },
+        "submittedAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["rsvpId", "guestId", "eventId", "weddingId", "attendanceStatus", "totalAttendees"]
+    },
+    "InvitationToken": {
+      "title": "InvitationToken",
+      "description": "Public lookup record linking unique token to guest and wedding",
+      "type": "object",
+      "properties": {
+        "token": { "type": "string", "maxLength": 100 },
+        "weddingId": { "type": "string" },
+        "guestId": { "type": "string" },
+        "guestName": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "familyName": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "expectedMembers": { "type": "number" },
+        "invitationUrl": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "maxLength": 40 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["token", "weddingId", "guestId", "guestName", "phone", "invitationUrl", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Host accounts and profiles"
+    },
+    "/weddings/{weddingId}": {
+      "schema": "Wedding",
+      "description": "Wedding records"
+    },
+    "/weddings/{weddingId}/events/{eventId}": {
+      "schema": "Event",
+      "description": "Ceremonies for a wedding"
+    },
+    "/weddings/{weddingId}/guests/{guestId}": {
+      "schema": "Guest",
+      "description": "Guests belonging to a wedding"
+    },
+    "/weddings/{weddingId}/invitations/{invitationId}": {
+      "schema": "Invitation",
+      "description": "Invitations sent to guests"
+    },
+    "/weddings/{weddingId}/rsvps/{rsvpId}": {
+      "schema": "RSVP",
+      "description": "Guest RSVP records"
+    },
+    "/invitation_tokens/{token}": {
+      "schema": "InvitationToken",
+      "description": "Token lookup index for personalized invitations"
+    }
+  }
+}

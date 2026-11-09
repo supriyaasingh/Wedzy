@@ -1,0 +1,1310 @@
+PROJECT: WEDDINGGUEST
+
+Smart Indian Wedding Invitation, RSVP & Guest Management Platform
+
+Act as a senior full-stack developer, UI/UX designer, database architect, and product designer.
+
+I want you to build a complete, production-quality web application called WeddingGuest.
+
+The purpose of this platform is to help Indian families organize weddings by sending digital invitations through WhatsApp, collecting guest attendance confirmations, tracking the number of people attending, and calculating how much food needs to be prepared.
+
+The main objective is to reduce unnecessary food preparation, prevent food wastage, simplify wedding planning, and make guest management easier.
+
+This should not look like an ordinary event management website.
+
+It should look and feel like a beautiful, premium, traditional Indian wedding invitation, combined with a modern wedding management application.
+
+---
+
+PART 1: BRAND IDENTITY AND DESIGN
+
+1. Brand Identity
+
+Application name: WeddingGuest
+
+Tagline: Celebrate More. Waste Less.
+
+Secondary tagline: Your Wedding, Beautifully Organized.
+
+Brand personality:
+
+- Traditional.
+- Festive.
+- Elegant.
+- Welcoming.
+- Modern.
+- Simple to use.
+- Culturally Indian.
+
+Create a beautiful logo combining a wedding mandap, floral elements, and elegant typography.
+
+2. Overall Visual Direction
+
+Use the uploaded reference images as inspiration.
+
+The design should combine:
+
+- Traditional Indian wedding invitation cards.
+- Beautiful hand-drawn illustrations.
+- Colourful Indian wedding decorations.
+- Modern web application interfaces.
+- Elegant digital invitation experiences.
+
+Make visitors feel as if they are opening a beautifully designed Indian wedding invitation.
+
+Avoid generic corporate dashboard designs.
+
+3. Indian Wedding Illustrations
+
+Use beautiful, colourful, hand-drawn cartoon-style illustrations throughout the application.
+
+Include illustrations of:
+
+Wedding celebrations:
+
+- Indian bride and groom in traditional wedding outfits.
+- Groom riding a decorated white horse.
+- Baraat procession.
+- Dhol players.
+- Shehnai players.
+- Wedding guests dancing.
+- Traditional wedding mandap.
+- Bride and groom exchanging garlands.
+- Wedding ceremonies.
+
+Traditional decorations:
+
+- Marigold garlands.
+- Banana leaves.
+- Floral torans.
+- Diyas.
+- Rangoli.
+- Lotus flowers.
+- Peacock feathers.
+- Traditional musical instruments.
+- Decorative arches.
+- Mandala patterns.
+- Traditional Indian motifs.
+
+Illustrations should be friendly, attractive, detailed, and culturally appropriate.
+
+Use SVG illustrations, custom illustrations, and suitable royalty-free visual assets.
+
+Do not use watermarked images or images with fake checkerboard transparency backgrounds.
+
+4. Colour Palette
+
+Primary colours:
+
+- Royal blue.
+- Maroon.
+- Traditional red.
+- Saffron orange.
+- Golden yellow.
+
+Secondary colours:
+
+- Cream.
+- Ivory.
+- Blush pink.
+- Leaf green.
+
+Use gold accents for:
+
+- Borders.
+- Headings.
+- Decorative elements.
+- Buttons.
+- Invitation frames.
+
+Keep the overall design balanced and premium.
+
+Do not use too many bright colours on the same screen.
+
+5. Typography
+
+Use:
+
+- Elegant serif fonts for wedding headings.
+- Beautiful script fonts for decorative couple names.
+- Clean sans-serif fonts for dashboard content.
+- Highly readable fonts for mobile forms.
+
+Maintain good readability and accessibility.
+
+---
+
+PART 2: MAIN WEBSITE
+
+6. Landing Page
+
+Create a beautiful, fully responsive landing page.
+
+Hero section:
+
+Large Indian wedding illustration featuring a bride and groom with a traditional decorative background.
+
+Main heading:
+
+"Your Wedding, Beautifully Organized."
+
+Subtitle:
+
+"Celebrate together. Plan smarter. Waste less."
+
+Buttons:
+
+- Create Your Wedding.
+- Explore Demo.
+
+Additional sections:
+
+1. Welcome section.
+2. How WeddingGuest works.
+3. Main features.
+4. Digital wedding invitations.
+5. WhatsApp RSVP process.
+6. Smart guest management.
+7. Food wastage reduction.
+8. Wedding themes showcase.
+9. Frequently asked questions.
+10. Footer.
+
+Include the following message:
+
+"Every wedding is special. Every guest matters. Every meal counts. Let's celebrate without unnecessary food waste."
+
+Add subtle animations:
+
+- Floating flower petals.
+- Glowing decorative lights.
+- Smooth transitions.
+- Gentle decorative movements.
+
+Make the website look attractive on first visit.
+
+---
+
+PART 3: USER AUTHENTICATION
+
+7. Account System
+
+Create a secure authentication system.
+
+Features:
+
+- Sign up.
+- Login.
+- Logout.
+- Forgot password.
+- Reset password.
+- Email verification.
+- User profile.
+- Change password.
+
+Users should be able to access only their own wedding information.
+
+Guests should NOT need an account to respond to invitations.
+
+Use Firebase Authentication.
+
+---
+
+PART 4: WEDDING CREATION
+
+8. Create Wedding
+
+After registration, users should see a Create Your Wedding button.
+
+Create a multi-step wedding creation form.
+
+Step 1: Couple details
+
+- Bride's full name.
+- Groom's full name.
+- Couple's photo (optional).
+- Bride's family name (optional).
+- Groom's family name (optional).
+
+Step 2: Wedding details
+
+- Wedding date.
+- Wedding time.
+- Wedding venue.
+- Full venue address.
+- Google Maps link.
+- RSVP deadline.
+- Contact information.
+
+Step 3: Invitation
+
+- Custom invitation message.
+- Upload wedding invitation image.
+- Select invitation design.
+- Choose wedding illustration theme.
+
+Step 4: Events
+
+Allow users to create multiple wedding functions:
+
+- Engagement.
+- Haldi.
+- Mehendi.
+- Sangeet.
+- Wedding ceremony.
+- Reception.
+- Other custom events.
+
+Each event should have:
+
+- Event name.
+- Date.
+- Start time.
+- End time.
+- Venue.
+- Dress code (optional).
+- Description.
+- Event-specific guest list.
+- Separate RSVP requirements.
+
+Step 5: Preview and publish.
+
+Generate a unique wedding invitation URL.
+
+Allow the host to edit wedding information later.
+
+Support multiple weddings under one account.
+
+---
+
+PART 5: WEDDING INVITATION DESIGNER
+
+9. Invitation Themes
+
+Create at least five professionally designed invitation templates.
+
+Theme 1: Royal Indian Wedding
+
+- Maroon and gold.
+- Royal borders.
+- Traditional mandap.
+- Elegant wedding typography.
+
+Theme 2: South Indian Wedding
+
+- Banana leaves.
+- Jasmine flowers.
+- Traditional instruments.
+- Veena and nadaswaram illustrations.
+- Traditional floral decorations.
+
+Theme 3: Punjabi Wedding
+
+- Baraat illustrations.
+- Decorated horse.
+- Dhol players.
+- Colourful wedding decorations.
+- Bright festive colours.
+
+Theme 4: Floral Wedding
+
+- Pastel pink.
+- Cream.
+- Floral borders.
+- Elegant bride and groom illustrations.
+
+Theme 5: Minimal Traditional
+
+- Ivory background.
+- Gold accents.
+- Minimal Indian motifs.
+- Elegant typography.
+
+10. Invitation Customization
+
+Allow users to:
+
+- Select a theme.
+- Change background colours within the theme.
+- Upload their own photos.
+- Edit invitation messages.
+- Change couple names.
+- Add family names.
+- Add wedding dates.
+- Add venue information.
+- Preview the invitation.
+- Switch between templates.
+
+Display the invitation like a real digital wedding card.
+
+Generate a unique shareable invitation link.
+
+Allow downloading the invitation as an image or PDF where supported.
+
+---
+
+PART 6: GUEST MANAGEMENT
+
+11. Guest List Management
+
+Create a dedicated Guest Management section.
+
+Users should be able to:
+
+Add guests manually:
+
+- Full name.
+- WhatsApp number.
+- Country code.
+- Email (optional).
+- Family name.
+- Guest category.
+- Expected family members.
+- Notes.
+
+Guest categories:
+
+- Bride's family.
+- Groom's family.
+- Friends.
+- Relatives.
+- Colleagues.
+- Neighbours.
+- Other.
+
+Additional functions:
+
+- Edit guest information.
+- Delete guest.
+- Search guests.
+- Filter guests.
+- Sort alphabetically.
+- Group guests by family.
+- View individual guest details.
+
+12. Bulk Guest Import
+
+Allow users to import guests through:
+
+- CSV files.
+- Excel files.
+
+Provide a sample downloadable template.
+
+Validate:
+
+- Guest names.
+- Phone numbers.
+- Duplicate numbers.
+- Missing information.
+
+Show a preview before importing.
+
+Allow users to correct invalid rows.
+
+Provide export functionality for the guest list.
+
+13. Family-wise Guest Management
+
+Allow a host to group multiple people under one family invitation.
+
+Example:
+
+Family: Sharma Family
+
+Primary contact: Rahul Sharma
+
+Expected members:
+
+- Rahul.
+- Wife.
+- Two children.
+
+The family should receive one invitation link.
+
+The primary contact can confirm the attendance of the entire family.
+
+Allow hosts to decide whether family members can be added or edited by the primary guest.
+
+---
+
+PART 7: WHATSAPP INVITATION SYSTEM
+
+14. Personalized WhatsApp Invitations
+
+This is one of the most important features.
+
+Generate a personalized invitation message for each guest.
+
+Example:
+
+"Hello Rahul!
+
+We are delighted to invite you and your family to celebrate the wedding of Priya and Aman.
+
+Date: 20 December 2026
+Time: 7:00 PM
+Venue: Mumbai
+
+Please confirm how many family members will attend using your personal RSVP link.
+
+[Unique RSVP Link]
+
+We hope to celebrate this beautiful occasion with you!
+
+With love,
+Priya & Aman"
+
+Provide:
+
+- Open WhatsApp button.
+- Copy message button.
+- Personalized invitation links.
+- Send individual invitations.
+- Track invitation sharing status.
+- Track RSVP status.
+- Send reminders.
+
+15. WhatsApp Integration Requirements
+
+Initially use WhatsApp Click-to-Chat links.
+
+Pre-fill the personalized invitation message and the guest's unique RSVP link.
+
+Open WhatsApp with the message ready to send.
+
+IMPORTANT:
+
+Do not falsely mark an invitation as delivered or sent merely because the WhatsApp link was opened.
+
+Track different statuses:
+
+- Not shared.
+- WhatsApp opened.
+- Manually marked as sent.
+- RSVP received.
+
+Design the system for future integration with the official WhatsApp Business Cloud API.
+
+For automated messaging, follow Meta's current policies, approved templates, opt-in requirements, and messaging limits.
+
+Do not use unofficial WhatsApp automation or scraping.
+
+---
+
+PART 8: GUEST RSVP SYSTEM
+
+16. Personalized Guest RSVP Page
+
+When a guest opens their invitation link, display a beautiful wedding invitation page.
+
+It should include:
+
+- Couple's names.
+- Bride and groom illustrations.
+- Wedding date.
+- Wedding time.
+- Wedding venue.
+- Google Maps navigation.
+- Custom invitation message.
+- Floral decorations.
+- Selected wedding theme.
+
+Display the question:
+
+"Will you be joining us to celebrate?"
+
+Two large buttons:
+
+YES, I'LL BE THERE!
+
+SORRY, I CAN'T MAKE IT.
+
+17. If Guest Selects YES
+
+Display the attendance form.
+
+Ask:
+
+1. Guest's name.
+2. Total number of attendees, including the primary guest.
+3. Number of adults.
+4. Number of children.
+5. Names of accompanying guests (optional).
+6. Dietary requirements (optional).
+7. Additional message (optional).
+
+Validate that:
+
+- Total attendees = adults + children.
+- The primary guest is included in the total.
+- The guest count is a valid positive number.
+- Guests cannot submit unreasonable quantities.
+
+18. If Guest Selects NO
+
+Display a thank-you message.
+
+Example:
+
+"Thank you for letting us know.
+
+We will miss celebrating with you. Sending you our love and best wishes!"
+
+Save the declined response.
+
+19. RSVP Management
+
+Allow guests to:
+
+- Submit their RSVP.
+- View confirmation.
+- Update their RSVP before the deadline.
+- Correct their guest count.
+- Change attendance status.
+
+Use unique, secure invitation tokens.
+
+Prevent duplicate records.
+
+Update existing RSVP records instead of creating duplicate submissions.
+
+Provide a configurable RSVP deadline.
+
+After the deadline, hosts should be able to lock responses or manually reopen them.
+
+---
+
+PART 9: WEDDING DASHBOARD
+
+20. Dashboard Overview
+
+Create a real-time dashboard with attractive Indian wedding-themed statistic cards.
+
+Display:
+
+- Total invited families.
+- Total invited individuals (if known).
+- Invitations shared.
+- Confirmed families.
+- Declined families.
+- Pending responses.
+- Confirmed adults.
+- Confirmed children.
+- Total expected attendees.
+- Estimated food plates required.
+
+Example:
+
+Total invited families: 100
+
+Confirmed families: 70
+
+Declined families: 10
+
+Pending families: 20
+
+Confirmed attendees: 220
+
+Adults: 180
+
+Children: 40
+
+Expected food plates: 231
+
+All dashboard information must be calculated from actual database records.
+
+Do not use hardcoded fake statistics.
+
+21. Dashboard Navigation
+
+Create these sections:
+
+1. Overview.
+2. My Weddings.
+3. Wedding Events.
+4. Guest Management.
+5. Invitations.
+6. RSVP Responses.
+7. Pending Responses.
+8. Food Planning.
+9. Seating Planner.
+10. Analytics.
+11. Reports.
+12. Settings.
+
+Create a clean sidebar for desktop and mobile-friendly navigation for phones.
+
+---
+
+PART 10: FOOD PLANNING AND WASTAGE REDUCTION
+
+22. Smart Food Calculator
+
+This is the main business value of WeddingGuest.
+
+Create a dedicated food planning section.
+
+Automatically calculate:
+
+- Confirmed adults.
+- Confirmed children.
+- Total confirmed attendees.
+- Optional food buffer.
+- Recommended food preparation quantity.
+
+Example:
+
+Confirmed adults: 180
+
+Confirmed children: 40
+
+Total confirmed: 220
+
+Food buffer: 5%
+
+Recommended food preparation: 231 plates.
+
+Formula:
+
+Recommended plates = Confirmed attendees × (1 + buffer percentage / 100)
+
+Round the result up to the next whole number.
+
+Allow hosts to change the buffer percentage.
+
+Default buffer: 5%.
+
+Allow a buffer of 0% to 30%.
+
+23. Food Planning Rules
+
+Very important:
+
+- Only confirmed attendees should be included.
+- Declined guests must not be counted.
+- Pending guests must not automatically be counted as confirmed.
+- Updated RSVP responses must immediately update the calculation.
+- Avoid counting the same guest twice.
+- Calculate separately for each wedding function.
+- Allow manual adjustments by the host.
+
+Add an optional scenario calculator:
+
+Scenario 1: Confirmed guests only.
+
+Scenario 2: Confirmed guests plus expected pending responses.
+
+Scenario 3: Confirmed guests plus selected buffer.
+
+Clearly distinguish estimates from confirmed attendance.
+
+24. Catering Planning
+
+Create an optional catering planner.
+
+Allow the host to record:
+
+- Caterer name.
+- Contact number.
+- Food menu.
+- Vegetarian plates.
+- Non-vegetarian plates.
+- Children's plates.
+- Special dietary meals.
+- Number of plates ordered.
+- Food budget.
+- Estimated cost per plate.
+- Actual catering cost.
+
+Calculate:
+
+- Total estimated catering cost.
+- Cost per attendee.
+- Expected plate requirement.
+- Difference between plates ordered and recommended plates.
+
+Do not automatically place orders or contact caterers.
+
+---
+
+PART 11: RSVP FOLLOW-UP AND REMINDERS
+
+25. Pending Guest Management
+
+Create a dedicated page showing guests who haven't responded.
+
+Features:
+
+- Filter by family.
+- Filter by category.
+- Search by name.
+- Sort by invitation status.
+- Select multiple guests.
+- Generate reminder messages.
+
+Example:
+
+"Hello Rahul!
+
+We are finalizing our wedding arrangements and would love to know whether you and your family will be joining us.
+
+Please confirm your attendance here:
+
+[RSVP Link]
+
+Thank you!"
+
+Allow reminders through WhatsApp sharing.
+
+Avoid sending repeated or unwanted messages.
+
+---
+
+PART 12: MULTIPLE WEDDING EVENTS
+
+26. Separate Event Management
+
+Allow users to manage multiple functions.
+
+For example:
+
+| Event | Date | RSVP |
+| Haldi | 18 Dec | Separate |
+| Mehendi | 19 Dec | Separate |
+| Wedding | 20 Dec | Separate |
+| Reception | 21 Dec | Separate |
+
+For every event, allow:
+
+- Separate guest lists.
+- Separate invitations.
+- Separate RSVP.
+- Separate guest counts.
+- Separate food planning.
+- Separate venue.
+- Separate attendance reports.
+
+Some guests may attend only the wedding, while others may attend multiple functions.
+
+Do not count a guest twice within the same event.
+
+---
+
+PART 13: SEATING ARRANGEMENT
+
+27. Basic Seating Planner
+
+Create an optional seating management section.
+
+Allow hosts to:
+
+- Create tables.
+- Set table capacity.
+- Assign guests or families.
+- View remaining seats.
+- Group families together.
+- Move guests between tables.
+
+Display a simple visual seating layout.
+
+Show:
+
+- Total seats.
+- Assigned seats.
+- Available seats.
+
+Do not require this feature for the basic RSVP process.
+
+---
+
+PART 14: ANALYTICS AND REPORTS
+
+28. Wedding Analytics
+
+Create visual reports showing:
+
+- Invitation status distribution.
+- Attendance percentage.
+- Confirmed versus declined.
+- Pending responses.
+- Adult versus child attendance.
+- Family-wise attendance.
+- Event-wise attendance.
+- RSVP response trends.
+
+Use clean charts and graphs.
+
+29. Downloadable Reports
+
+Allow users to download:
+
+- Guest list.
+- Confirmed guest list.
+- Declined guest list.
+- Pending guest list.
+- Food planning report.
+- Catering report.
+- Event-wise attendance report.
+
+Support CSV and Excel exports.
+
+Generate a printable report and PDF where supported.
+
+---
+
+PART 15: QR CODE SYSTEM
+
+30. QR Code Invitations
+
+Generate a unique QR code for every guest invitation.
+
+Allow hosts to:
+
+- Download QR codes.
+- Include QR codes in digital invitations.
+- Print QR codes.
+- Scan QR codes to open the associated RSVP page.
+
+Optionally create a wedding check-in system for the wedding day.
+
+The check-in system should:
+
+- Verify the invitation token.
+- Show the guest's confirmed party size.
+- Record check-in.
+- Prevent duplicate check-ins.
+- Display remaining expected attendees.
+
+---
+
+PART 16: USER SETTINGS
+
+31. Settings
+
+Include:
+
+- User profile.
+- Wedding preferences.
+- Default invitation theme.
+- Notification preferences.
+- RSVP deadline.
+- Food buffer percentage.
+- Privacy settings.
+- Account settings.
+- Delete account.
+- Export personal data.
+
+---
+
+PART 17: MOBILE RESPONSIVENESS AND PWA
+
+32. Mobile-First Application
+
+The application must work beautifully on:
+
+- Android smartphones.
+- iPhones.
+- Tablets.
+- Laptops.
+- Desktop computers.
+
+Design mobile screens first.
+
+Ensure:
+
+- No horizontal scrolling.
+- Proper button sizes.
+- Readable fonts.
+- Mobile-friendly forms.
+- Responsive navigation.
+- Fast loading.
+- Optimized illustrations.
+
+33. Progressive Web App
+
+Make the application installable as a PWA.
+
+Include:
+
+- Web app manifest.
+- App icons.
+- Service worker.
+- Install prompt.
+- Offline support for suitable static pages.
+- App-like navigation.
+
+The guest RSVP submission must clearly communicate whether the response was successfully saved. Do not display a false success message when offline.
+
+---
+
+PART 18: TECHNOLOGY STACK
+
+34. Frontend
+
+Use:
+
+- React.
+- TypeScript.
+- Vite.
+- Tailwind CSS.
+- Lucide icons.
+- Framer Motion or lightweight CSS animations.
+
+Use reusable components.
+
+Maintain clean code architecture.
+
+35. Backend
+
+Use Firebase:
+
+- Firebase Authentication.
+- Cloud Firestore.
+- Firebase Storage.
+- Firebase Cloud Functions where required.
+
+Use environment variables for configuration.
+
+Never expose secret API keys or privileged credentials in frontend code.
+
+36. Database Structure
+
+Design a scalable database.
+
+Suggested collections:
+
+users
+
+- userId
+- name
+- email
+- createdAt
+
+weddings
+
+- weddingId
+- ownerId
+- brideName
+- groomName
+- weddingDate
+- venue
+- theme
+- invitationMessage
+- rsvpDeadline
+- createdAt
+
+events
+
+- eventId
+- weddingId
+- eventName
+- eventDate
+- venue
+- startTime
+- endTime
+
+guests
+
+- guestId
+- weddingId
+- name
+- phone
+- category
+- familyGroup
+- expectedMembers
+
+invitations
+
+- invitationId
+- guestId
+- eventId
+- uniqueToken
+- sharingStatus
+- createdAt
+
+rsvps
+
+- rsvpId
+- guestId
+- eventId
+- attendanceStatus
+- adultCount
+- childCount
+- totalAttendees
+- submittedAt
+- updatedAt
+
+foodPlans
+
+- foodPlanId
+- eventId
+- bufferPercentage
+- recommendedPlates
+- manualAdjustment
+
+checkIns
+
+- checkInId
+- guestId
+- eventId
+- checkedInAt
+
+Adjust the structure where needed for proper scalability and relational consistency.
+
+Use transactions or secure backend logic for operations requiring consistency.
+
+---
+
+PART 19: SECURITY AND VALIDATION
+
+37. Security Requirements
+
+- Use Firebase Authentication.
+- Implement strict Firestore security rules.
+- Users can only access their own wedding records.
+- Guests can access only their intended public invitation and RSVP functionality.
+- Use cryptographically secure random invitation tokens.
+- Do not expose guest lists publicly.
+- Do not expose phone numbers to other guests.
+- Validate all input on the backend.
+- Protect against unauthorized database updates.
+- Rate-limit public RSVP endpoints where possible.
+- Protect against duplicate submissions.
+- Avoid exposing private wedding information through URLs.
+- Provide secure data deletion.
+
+Never trust frontend-only validation for sensitive operations.
+
+---
+
+PART 20: FUNCTIONALITY REQUIREMENTS
+
+38. Important Development Rules
+
+Every feature must actually work.
+
+Do not create:
+
+- Fake dashboard statistics.
+- Fake RSVP responses.
+- Non-functional buttons.
+- Placeholder charts pretending to contain real data.
+- Mock WhatsApp delivery statuses.
+- Fake authentication.
+- Hardcoded guest information.
+
+Use actual database records.
+
+Every form must validate and save data.
+
+Every button must perform its advertised action.
+
+Show:
+
+- Loading indicators.
+- Success messages.
+- Error messages.
+- Empty states.
+- Confirmation dialogs.
+- Form validation messages.
+
+Make sure data persists after refreshing the page.
+
+Use reusable components and a consistent design system.
+
+---
+
+PART 21: TESTING
+
+39. Required Test Scenarios
+
+Test the entire application.
+
+Test 1:
+A host creates an account and logs in.
+
+Test 2:
+A host creates a wedding.
+
+Test 3:
+A host selects a wedding theme.
+
+Test 4:
+A host adds 10 guests.
+
+Test 5:
+The host generates personalized invitation links.
+
+Test 6:
+The host opens WhatsApp sharing for a guest.
+
+Test 7:
+A guest opens their invitation link without logging in.
+
+Test 8:
+The guest confirms attendance for 4 people.
+
+Test 9:
+The dashboard updates automatically.
+
+Test 10:
+The food calculator calculates the correct number of plates.
+
+Test 11:
+A guest changes their RSVP from 4 people to 3 people.
+
+Test 12:
+The dashboard and food calculation update correctly.
+
+Test 13:
+A guest declines the invitation.
+
+Test 14:
+The declined guest is removed from confirmed attendance.
+
+Test 15:
+A pending guest is not included in confirmed attendance.
+
+Test 16:
+A host creates separate Haldi and Wedding events.
+
+Test 17:
+Guests respond separately to both events.
+
+Test 18:
+One host cannot access another host's private wedding information.
+
+Test 19:
+The application works correctly on Android.
+
+Test 20:
+The PWA can be installed and launched.
+
+Fix all errors before declaring the application complete.
+
+---
+
+PART 22: DEVELOPMENT STRATEGY
+
+40. Build the Application in Phases
+
+Do not try to build every feature in one step.
+
+Develop the application in the following order.
+
+PHASE 1: Foundation
+
+- Project setup.
+- Design system.
+- Landing page.
+- Indian wedding illustrations.
+- Responsive navigation.
+
+PHASE 2: Authentication
+
+- Registration.
+- Login.
+- Password reset.
+- User dashboard.
+
+PHASE 3: Wedding Creation
+
+- Wedding details.
+- Event management.
+- Wedding themes.
+- Invitation customization.
+
+PHASE 4: Guest Management
+
+- Add guests.
+- Edit guests.
+- Delete guests.
+- Family grouping.
+- CSV and Excel import.
+
+PHASE 5: Invitations
+
+- Personalized invitation.
+- Unique guest links.
+- WhatsApp Click-to-Chat.
+- Invitation status.
+
+PHASE 6: RSVP
+
+- Guest invitation page.
+- Yes/No attendance.
+- Adult and child counts.
+- RSVP submission.
+- RSVP editing.
+
+PHASE 7: Dashboard
+
+- Live statistics.
+- Attendance reports.
+- Pending guest list.
+
+PHASE 8: Food Planning
+
+- Confirmed guest calculations.
+- Food buffer.
+- Catering planning.
+- Food wastage reduction.
+
+PHASE 9: Advanced Features
+
+- Reminders.
+- Seating planner.
+- QR codes.
+- Wedding check-in.
+- Analytics.
+- Downloadable reports.
+
+PHASE 10: Finalization
+
+- Security testing.
+- Mobile testing.
+- PWA setup.
+- Performance optimization.
+- Deployment preparation.
+
+After completing each phase:
+
+1. Test all new functionality.
+2. Fix bugs.
+3. Check existing functionality.
+4. Verify mobile responsiveness.
+5. Confirm database persistence.
+6. Only then move to the next phase.
+
+---
+
+FINAL INSTRUCTIONS
+
+The final product must be a complete, usable Indian wedding management platform.
+
+The design must be beautiful enough to resemble a premium digital wedding invitation.
+
+The functionality must be reliable enough to help families organize actual weddings.
+
+The most important business objective is:
+
+Help families know how many guests are coming so they can prepare the right amount of food and reduce food wastage.
+
+Prioritize simplicity because many users will be parents and family members who are not comfortable with complicated technology.
+
+Make the entire experience easy to understand.
+
+Do not remove existing working functionality when implementing new features.
+
+Start by inspecting the existing project and understanding its current architecture.
+
+Then build Phase 1.
+
+Do not attempt to implement all phases simultaneously.
+
+Show me what has been completed, what files were changed, and what needs testing after every phase.
+
+The goal is to create a beautiful, reliable, mobile-first Indian wedding platform called WeddingGuest.
+
+WeddingGuest – Celebrate More. Waste Less.
