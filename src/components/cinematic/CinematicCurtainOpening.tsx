@@ -54,7 +54,7 @@ export const CinematicCurtainOpening: React.FC<CinematicCurtainOpeningProps> = (
     img.onload = () => setLogoLoaded(true);
     img.onerror = () => {
       // Fallback path in case primary path differs in specific environment
-      img.src = '/assets/aistudio/file_000000007d68820bba9ee26238e8c1b3_e2dcf583.png';
+      img.src = '/assets/wedding_guest_logo_512.png';
       setLogoLoaded(true);
     };
 
@@ -165,31 +165,30 @@ export const CinematicCurtainOpening: React.FC<CinematicCurtainOpeningProps> = (
               : 'opacity-0 scale-90 translate-y-4'
           }`}
         >
-          {/* Logo Frame with Golden Glow */}
-          <div className="relative group max-w-[420px] sm:max-w-[480px] w-full rounded-2xl p-2 sm:p-3 overflow-hidden">
+          {/* Logo Frame with Golden Aura and Royal WG Presentation */}
+          <div className="relative group max-w-[340px] sm:max-w-[420px] md:max-w-[460px] w-full p-2 flex flex-col items-center">
             
-            {/* Ambient Radial Spotlight behind Logo */}
-            <div className="absolute inset-0 bg-radial from-[#F59E0B]/25 via-[#D97706]/10 to-transparent blur-xl pointer-events-none" />
+            {/* Ambient Radial Spotlight behind WG Logo */}
+            <div className="absolute inset-0 bg-radial from-[#F59E0B]/30 via-[#D97706]/15 to-transparent blur-2xl pointer-events-none rounded-3xl" />
 
-            {/* The Actual Reference Image 2: WeddingGuest Logo */}
-            <div className="relative rounded-xl overflow-hidden shadow-2xl border-2 border-[#E5C378]/70 bg-[#360309]">
+            {/* The Actual Burgundy-and-Gold WeddingGuest WG Logo */}
+            <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)] border-2 border-[#E5C378]/80 bg-[#360309] backdrop-blur-xs">
               <img
                 src={logoSrc}
                 alt="WeddingGuest — Every Guest. Every Moment. Perfectly Planned."
-                className="w-full h-auto object-contain block select-none"
+                className="w-full h-full object-contain block select-none rounded-3xl"
                 loading="eager"
                 onError={(e) => {
-                  // Fallback path
                   const target = e.currentTarget;
-                  if (!target.src.includes('file_000000007d68820bba9ee26238e8c1b3_e2dcf583.png')) {
-                    target.src = '/assets/aistudio/file_000000007d68820bba9ee26238e8c1b3_e2dcf583.png';
+                  if (!target.src.includes('wedding_guest_logo_512.png')) {
+                    target.src = '/assets/wedding_guest_logo_512.png';
                   }
                 }}
               />
 
               {/* Shimmer Sweep Animation Across Logo */}
               <div
-                className={`absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full ${
+                className={`absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full rounded-3xl ${
                   phase === 'logo' ? 'animate-[curtainShimmer_1.8s_ease-in-out_infinite]' : ''
                 }`}
                 style={{
@@ -199,10 +198,10 @@ export const CinematicCurtainOpening: React.FC<CinematicCurtainOpeningProps> = (
             </div>
 
             {/* Subtle Golden Caption Accent */}
-            <div className="flex items-center justify-center gap-2 mt-3 text-xs tracking-widest text-[#E5C378] font-cinzel opacity-90">
-              <Sparkles className="w-3 h-3 text-[#FDE047]" />
-              <span className="text-[11px] uppercase font-bold text-[#FDE047]">Auspicious Wedding Platform</span>
-              <Sparkles className="w-3 h-3 text-[#FDE047]" />
+            <div className="flex items-center justify-center gap-2 mt-4 text-xs tracking-widest text-[#E5C378] font-cinzel opacity-90">
+              <Sparkles className="w-3.5 h-3.5 text-[#FDE047]" />
+              <span className="text-[11px] uppercase font-bold text-[#FDE047] tracking-widest">Auspicious Wedding Platform</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#FDE047]" />
             </div>
 
           </div>
@@ -423,9 +422,13 @@ export const CinematicCurtainOpening: React.FC<CinematicCurtainOpeningProps> = (
           isOpening ? 'opacity-0 scale-150 blur-xs' : 'opacity-100 scale-100'
         }`}
       >
-        <div className="w-14 sm:w-16 h-14 sm:h-16 rounded-full bg-gradient-to-tr from-[#8C5806] via-[#FDE047] to-[#D4AF37] p-1 shadow-2xl border-2 border-[#FFE58F] flex items-center justify-center animate-pulse">
-          <div className="w-full h-full rounded-full bg-[#5B0616] border border-[#FDE047] flex items-center justify-center text-[#FDE047] shadow-inner">
-            <span className="font-serif font-bold text-xs sm:text-sm tracking-wider">WG</span>
+        <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-gradient-to-tr from-[#8C5806] via-[#FDE047] to-[#D4AF37] p-1 shadow-2xl border-2 border-[#FFE58F] flex items-center justify-center animate-pulse">
+          <div className="w-full h-full rounded-full overflow-hidden bg-[#360309] border border-[#FDE047] flex items-center justify-center shadow-inner">
+            <img
+              src="/assets/wedding_guest_logo_192.png"
+              alt="Wedding Emblem"
+              className="w-full h-full object-cover rounded-full"
+            />
           </div>
         </div>
       </div>

@@ -444,6 +444,15 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
           <CornerOrnament position="tl" className="absolute top-3 left-3 w-8 h-8 text-[#D4AF37]" />
           <CornerOrnament position="tr" className="absolute top-3 right-3 w-8 h-8 text-[#D4AF37]" />
 
+          {/* Burgundy & Gold WG Wedding Emblem */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl overflow-hidden border border-[#D4AF37] shadow-lg bg-[#360309]">
+            <img
+              src="/assets/wedding_guest_logo_192.png"
+              alt="WeddingGuest Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
           {/* Invocation */}
           <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#FDE68A]">
             <DiyaIcon className="w-4 h-4" />

@@ -58,8 +58,12 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onNavigate('landing')}
             className="flex items-center gap-2.5 text-left group focus:outline-hidden"
           >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#800020] to-[#5B0616] flex items-center justify-center shadow-sm border border-[#E5C378]/60 group-hover:scale-105 transition-transform">
-              <DiyaIcon className="w-5 h-5" />
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-sm border border-[#D4AF37] group-hover:scale-105 transition-transform bg-[#360309] shrink-0">
+              <img
+                src="/assets/wedding_guest_logo_192.png"
+                alt="WeddingGuest Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#800020] group-hover:text-[#5B0616] transition-colors leading-none">

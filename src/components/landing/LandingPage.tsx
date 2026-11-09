@@ -112,13 +112,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="relative pt-8 pb-16 lg:pt-14 lg:pb-24 border-b border-[#E5C378]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* Top Auspicious Kalash Banner */}
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <DiyaIcon className="w-5 h-5 text-[#B45309]" />
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-[#B45309] font-serif-luxury">
-              Auspicious Indian Wedding Invitation & Food Management
-            </span>
-            <DiyaIcon className="w-5 h-5 text-[#B45309]" />
+          {/* Top Auspicious WG Logo Banner */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-xl overflow-hidden border border-[#D4AF37] shadow-md bg-[#360309] shrink-0">
+              <img
+                src="/assets/wedding_guest_logo_192.png"
+                alt="WeddingGuest Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-[#800020] font-serif-luxury">
+                WeddingGuest Platform
+              </span>
+              <span className="text-[11px] font-medium text-[#B45309]">
+                Every Guest. Every Moment. Perfectly Planned.
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -785,8 +795,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Brand column (5 cols) */}
             <div className="md:col-span-5 space-y-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-[#800020] flex items-center justify-center border border-[#D4AF37]">
-                  <DiyaIcon className="w-5 h-5 text-[#FDE047]" />
+                <div className="w-10 h-10 rounded-xl overflow-hidden border border-[#D4AF37] bg-[#360309] shadow-sm shrink-0">
+                  <img
+                    src="/assets/wedding_guest_logo_192.png"
+                    alt="WeddingGuest Logo"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <span className="font-display text-2xl font-bold tracking-tight text-[#FDE047]">
                   WeddingGuest

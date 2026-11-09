@@ -11,6 +11,18 @@
   "theme_color": "#800020",
   "icons": [
     {
+      "src": "/assets/wedding_guest_logo_192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/wedding_guest_logo_512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/icon.svg",
       "type": "image/svg+xml",
       "sizes": "192x192 512x512",

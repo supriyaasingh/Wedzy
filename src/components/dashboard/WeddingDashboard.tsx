@@ -146,8 +146,12 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[#5B0616] border border-[#E5C378] flex items-center justify-center shrink-0 shadow-sm">
-                <SacredKalash className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-xl overflow-hidden border border-[#E5C378] flex items-center justify-center shrink-0 shadow-sm bg-[#360309]">
+                <img
+                  src="/assets/wedding_guest_logo_192.png"
+                  alt="WeddingGuest Logo"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#FDE68A] uppercase tracking-wider">

@@ -220,8 +220,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#800020] to-[#5B0616] border border-[#E5C378] mb-3 shadow-sm">
-              <DiyaIcon className="w-6 h-6" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#E5C378] mb-3 shadow-md bg-[#360309]">
+              <img
+                src="/assets/wedding_guest_logo_192.png"
+                alt="WeddingGuest Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             <h3 className="font-display text-xl sm:text-2xl font-bold text-[#800020]">
