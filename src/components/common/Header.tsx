@@ -10,6 +10,7 @@ interface HeaderProps {
   onNavigate: (view: 'landing' | 'dashboard' | 'create-wedding' | 'rsvp-preview') => void;
   onOpenAuthModal: () => void;
   onOpenProfileModal: () => void;
+  onReplayIntro?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   onOpenAuthModal,
   onOpenProfileModal,
+  onReplayIntro,
 }) => {
   const { currentUser } = useWedding();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -84,6 +86,18 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Zone 3: Primary Action, PWA Install & Auth */}
           <div className="hidden sm:flex items-center gap-3 shrink-0">
+            {/* Curtain Intro Replay Button */}
+            {onReplayIntro && (
+              <button
+                onClick={onReplayIntro}
+                title="Watch Royal Curtain Opening & Logo Reveal"
+                className="px-2.5 py-1.5 text-xs font-semibold text-[#800020] bg-[#FAF0D4]/80 hover:bg-[#FAF0D4] border border-[#E5C378] rounded-md transition-all flex items-center gap-1.5 shadow-2xs whitespace-nowrap group"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#B45309] group-hover:rotate-12 transition-transform" />
+                <span className="hidden md:inline">Curtain Intro</span>
+              </button>
+            )}
+
             {/* PWA Install Button */}
             <PWAInstallButton variant="navbar" />
 
@@ -186,6 +200,18 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex justify-center pb-1">
               <PWAInstallButton variant="navbar" />
             </div>
+            {onReplayIntro && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onReplayIntro();
+                }}
+                className="w-full py-2 px-3 text-center text-xs font-semibold text-[#800020] bg-[#FAF0D4] hover:bg-[#F5E3B5] border border-[#E5C378] rounded-md shadow-2xs flex items-center justify-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#B45309]" />
+                <span>Watch Curtain Opening Intro</span>
+              </button>
+            )}
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

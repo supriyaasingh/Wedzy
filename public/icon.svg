@@ -1,58 +1,82 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="maroonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#800020" />
-      <stop offset="100%" stop-color="#4A0012" />
+    <!-- Royal Burgundy Velvet Background Gradient -->
+    <radialGradient id="burgundyBg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#6B0A1C" />
+      <stop offset="50%" stop-color="#4A0512" />
+      <stop offset="100%" stop-color="#2D0209" />
+    </radialGradient>
+
+    <!-- Antique Royal Gold Shimmer Gradient -->
+    <linearGradient id="antiqueGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2A3" />
+      <stop offset="25%" stop-color="#E5B94E" />
+      <stop offset="50%" stop-color="#FCD34D" />
+      <stop offset="75%" stop-color="#C68A1E" />
+      <stop offset="100%" stop-color="#8C5806" />
     </linearGradient>
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FDE047" />
-      <stop offset="50%" stop-color="#D4AF37" />
-      <stop offset="100%" stop-color="#B8860B" />
-    </linearGradient>
-    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#EA580C" />
-      <stop offset="60%" stop-color="#F59E0B" />
-      <stop offset="100%" stop-color="#FEF08A" />
-    </linearGradient>
+
+    <!-- Deep Gold Shadow for Dimension -->
+    <filter id="goldDropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+
+    <!-- Subtle Inner Glow -->
+    <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="80%" stop-color="#000" stop-opacity="0" />
+      <stop offset="100%" stop-color="#000" stop-opacity="0.45" />
+    </radialGradient>
   </defs>
-  <!-- Background with gold border -->
-  <rect width="512" height="512" rx="112" fill="url(#maroonGrad)" />
-  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="url(#goldGrad)" stroke-width="8" opacity="0.8" />
-  
-  <!-- Sacred Kalash with Coconut and Mango Leaves -->
-  <g transform="translate(256, 270) scale(1.35)">
-    <!-- Mango leaves -->
-    <path d="M-50 -30 C-70 -70 -30 -110 0 -130 C-10 -90 -20 -60 -20 -30 Z" fill="#166534" />
-    <path d="M50 -30 C70 -70 30 -110 0 -130 C10 -90 20 -60 20 -30 Z" fill="#166534" />
-    <path d="M-25 -30 C-40 -80 0 -120 0 -140 C-5 -100 -10 -70 -10 -30 Z" fill="#15803D" />
-    <path d="M25 -30 C40 -80 0 -120 0 -140 C5 -100 10 -70 10 -30 Z" fill="#15803D" />
-    <!-- Coconut / Nariyal -->
-    <ellipse cx="0" cy="-60" rx="34" ry="42" fill="#78350F" />
-    <circle cx="0" cy="-70" r="12" fill="#92400E" />
-    <!-- Kalash Vessel -->
-    <!-- Rim -->
-    <ellipse cx="0" cy="-25" rx="46" ry="10" fill="url(#goldGrad)" stroke="#B8860B" stroke-width="3" />
-    <!-- Neck -->
-    <path d="M-36 -24 L-28 -5 Q-55 40 -40 75 Q-20 100 0 100 Q20 100 40 75 Q55 40 28 -5 L36 -24 Z" fill="url(#goldGrad)" stroke="#B8860B" stroke-width="4" />
-    <!-- Swastika / Auspicious Emblem on pot -->
-    <g stroke="#800020" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.9">
-      <path d="M0,20 L0,56 M-18,38 L18,38" />
-      <path d="M0,20 L16,20" />
-      <path d="M18,38 L18,54" />
-      <path d="M0,56 L-16,56" />
-      <path d="M-18,38 L-18,22" />
-      <circle cx="-9" cy="29" r="1.5" fill="#800020" />
-      <circle cx="9" cy="29" r="1.5" fill="#800020" />
-      <circle cx="-9" cy="47" r="1.5" fill="#800020" />
-      <circle cx="9" cy="47" r="1.5" fill="#800020" />
-    </g>
-    <!-- Base -->
-    <ellipse cx="0" cy="100" rx="28" ry="8" fill="url(#goldGrad)" />
+
+  <!-- Base Burgundy Rounded Icon -->
+  <rect width="512" height="512" rx="112" fill="url(#burgundyBg)" />
+  <rect width="512" height="512" rx="112" fill="url(#innerGlow)" />
+
+  <!-- Outer Double Gold Royal Border -->
+  <rect x="20" y="20" width="472" height="472" rx="96" fill="none" stroke="url(#antiqueGold)" stroke-width="6" opacity="0.85" />
+  <rect x="32" y="32" width="448" height="448" rx="84" fill="none" stroke="url(#antiqueGold)" stroke-width="2" stroke-dasharray="8 6" opacity="0.6" />
+
+  <!-- 4 Corner Auspicious Floral Accents -->
+  <g fill="url(#antiqueGold)">
+    <circle cx="56" cy="56" r="5" />
+    <circle cx="456" cy="56" r="5" />
+    <circle cx="56" cy="456" r="5" />
+    <circle cx="456" cy="456" r="5" />
   </g>
-  <!-- Diya base flame in foreground accent -->
-  <g transform="translate(256, 435) scale(0.9)">
-    <path d="M-50,0 Q0,25 50,0 Q25,-8 0,-8 Q-25,-8 -50,0 Z" fill="url(#goldGrad)" stroke="#B8860B" stroke-width="2" />
-    <!-- Flame -->
-    <path d="M0,-8 C-12,-25 0,-48 0,-58 C0,-48 12,-25 0,-8 Z" fill="url(#flameGrad)" />
+
+  <!-- Central WG Monogram Group -->
+  <g filter="url(#goldDropShadow)">
+    
+    <!-- Heart Motif above W apex -->
+    <path d="M 256,128 C 248,114 230,110 220,122 C 206,138 220,154 256,182 C 292,154 306,138 292,122 C 282,110 264,114 256,128 Z"
+          fill="none" stroke="url(#antiqueGold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- "W" Letterform (Classical Royal Calligraphy Serif) -->
+    <!-- Left diagonal stem with top serif -->
+    <path d="M 130,175 L 178,175 M 154,175 L 202,345 L 230,345 L 256,220 L 282,345 L 310,345 L 358,175 M 336,175 L 380,175"
+          fill="none" stroke="url(#antiqueGold)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Solid decorative serif caps and calligraphic stroke weight -->
+    <path d="M 145,175 L 185,175 L 222,335 L 198,335 Z" fill="url(#antiqueGold)" />
+    <path d="M 248,228 L 264,228 L 298,335 L 278,335 Z" fill="url(#antiqueGold)" />
+
+    <!-- "G" Letterform (Interlaced Royal Curved Capital) -->
+    <path d="M 368,235 C 342,205 295,200 252,225 C 200,255 190,325 235,372 C 275,412 342,408 375,372 C 388,358 394,340 395,315 L 318,315"
+          fill="none" stroke="url(#antiqueGold)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" />
+
+    <!-- G Spur / Crossbar flourish -->
+    <path d="M 320,305 L 400,305 L 400,332 L 320,332 Z" fill="url(#antiqueGold)" />
+
+    <!-- 4-Point Star Sparkle to right of G -->
+    <path d="M 425,270 Q 425,285 410,285 Q 425,285 425,300 Q 425,285 440,285 Q 425,285 425,270 Z"
+          fill="url(#antiqueGold)" />
+    <circle cx="425" cy="285" r="2.5" fill="#FFF2A3" />
+
+    <!-- Bottom Auspicious Floral Flourish -->
+    <path d="M 210,418 Q 256,432 302,418 Q 280,410 256,422 Q 232,410 210,418 Z" fill="url(#antiqueGold)" opacity="0.9" />
+    <circle cx="256" cy="428" r="4" fill="url(#antiqueGold)" />
+    <circle cx="236" cy="425" r="2.5" fill="url(#antiqueGold)" />
+    <circle cx="276" cy="425" r="2.5" fill="url(#antiqueGold)" />
+
   </g>
 </svg>

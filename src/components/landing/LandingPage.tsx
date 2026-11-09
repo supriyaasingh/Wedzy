@@ -36,12 +36,14 @@ interface LandingPageProps {
   onExploreDemo: () => void;
   onCreateWedding: () => void;
   onOpenRsvpModal: () => void;
+  onReplayIntro?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onExploreDemo,
   onCreateWedding,
   onOpenRsvpModal,
+  onReplayIntro,
 }) => {
   const { currentWedding } = useWedding();
   const [selectedThemeId, setSelectedThemeId] = useState<WeddingThemeId>('royal_maroon');
@@ -158,6 +160,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     Instant Access
                   </span>
                 </button>
+
+                {onReplayIntro && (
+                  <button
+                    onClick={onReplayIntro}
+                    className="w-full sm:w-auto px-5 py-3.5 text-sm font-bold text-[#800020] bg-white/90 hover:bg-[#FAF0D4] border-2 border-[#E5C378] rounded-xl shadow-xs transition-all flex items-center justify-center gap-2"
+                    title="Watch the royal wedding curtain opening animation and logo reveal"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#B45309]" />
+                    <span>Watch Royal Intro</span>
+                  </button>
+                )}
               </div>
 
               {/* Trust & Culture Markers */}

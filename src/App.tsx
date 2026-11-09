@@ -13,6 +13,7 @@ import { OfflineIndicator } from './components/pwa/OfflineIndicator';
 import { Guest } from './types/wedding';
 import { parseInvitationTokenFromUrl } from './utils/urlHelper';
 import { ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
+import { CinematicCurtainOpening } from './components/cinematic/CinematicCurtainOpening';
 
 function WeddingGuestApp() {
   const { currentWedding, getGuestByToken, guests } = useWedding();
@@ -23,6 +24,19 @@ function WeddingGuestApp() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedGuestForRsvp, setSelectedGuestForRsvp] = useState<Guest | undefined>(undefined);
+
+  // Cinematic Wedding Curtain Opening & Logo Reveal (once per session)
+  const [showCurtainIntro, setShowCurtainIntro] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return false;
+      }
+      return !sessionStorage.getItem('weddingguest_curtain_intro_seen');
+    } catch {
+      return false;
+    }
+  });
 
   // Check URL token (e.g. ?rsvp=tok_sharma_9811 or /invitation/tok_sharma_9811)
   const [urlToken, setUrlToken] = useState<string | null>(null);
@@ -65,6 +79,7 @@ function WeddingGuestApp() {
         }}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenProfileModal={() => setIsProfileModalOpen(true)}
+        onReplayIntro={() => setShowCurtainIntro(true)}
       />
 
       {/* Main Content Area */}
@@ -74,6 +89,7 @@ function WeddingGuestApp() {
             onExploreDemo={() => setCurrentView('dashboard')}
             onCreateWedding={() => setIsCreateWizardOpen(true)}
             onOpenRsvpModal={handleOpenGeneralRsvp}
+            onReplayIntro={() => setShowCurtainIntro(true)}
           />
         )}
 
@@ -131,6 +147,18 @@ function WeddingGuestApp() {
 
       {/* Offline Mode Indicator Banner */}
       <OfflineIndicator />
+
+      {/* Cinematic Royal Wedding Curtain Opening & Logo Reveal */}
+      {showCurtainIntro && (
+        <CinematicCurtainOpening
+          onComplete={() => {
+            setShowCurtainIntro(false);
+            try {
+              sessionStorage.setItem('weddingguest_curtain_intro_seen', 'true');
+            } catch {}
+          }}
+        />
+      )}
     </div>
   );
 }

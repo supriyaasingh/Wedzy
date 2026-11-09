@@ -104,6 +104,15 @@
   animation: pulse-glow 3.5s ease-in-out infinite;
 }
 
+@keyframes curtainShimmer {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
