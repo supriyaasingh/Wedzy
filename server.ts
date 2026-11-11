@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -9,7 +10,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = parseInt(process.env.PORT || '3000', 10);
+// In development, AI Studio proxies external traffic via Nginx (port 8080) to port 3000.
+// Dev server must strictly run on port 3000 to prevent EADDRINUSE collisions.
+const port = process.env.NODE_ENV === 'production' && process.env.PORT
+  ? parseInt(process.env.PORT, 10)
+  : 3000;
 
 app.use(express.json());
 
@@ -234,6 +239,8 @@ app.get('/api/whatsapp/status/:messageId', (req: Request, res: Response) => {
 // ==========================================
 
 async function startServer() {
+  const server = http.createServer(app);
+
   if (process.env.NODE_ENV === 'production') {
     const distPath = path.resolve(__dirname, 'dist');
     app.use(express.static(distPath));
@@ -243,17 +250,22 @@ async function startServer() {
       res.sendFile(path.resolve(distPath, 'index.html'));
     });
   } else {
-    // Development mode: Mount Vite middleware
+    // Development mode: Mount Vite middleware with HTTP server attached for clean WebSocket handling
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: {
+          server,
+        },
+      },
       appType: 'spa',
     });
 
     app.use(vite.middlewares);
   }
 
-  app.listen(port, '0.0.0.0', () => {
+  server.listen(port, '0.0.0.0', () => {
     console.log(`WeddingGuest server running on http://0.0.0.0:${port}`);
   });
 }

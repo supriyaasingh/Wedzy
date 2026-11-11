@@ -234,6 +234,38 @@ export async function syncRsvpToFirestore(rsvp: EventRSVP): Promise<void> {
   }
 }
 
+// ==========================================
+// CUSTOM RSVP QUESTIONS
+// ==========================================
+
+export async function syncQuestionToFirestore(question: import('../types/wedding').CustomRsvpQuestion): Promise<void> {
+  const path = `weddings/${question.weddingId}/questions/${question.questionId}`;
+  try {
+    await setDoc(doc(db, 'weddings', question.weddingId, 'questions', question.questionId), question, { merge: true });
+  } catch (error) {
+    console.warn(`[Firestore] Failed to sync question ${question.questionId}:`, error);
+  }
+}
+
+export async function getQuestionsFromFirestore(weddingId: string): Promise<import('../types/wedding').CustomRsvpQuestion[]> {
+  try {
+    const snap = await getDocs(collection(db, 'weddings', weddingId, 'questions'));
+    return snap.docs.map((d) => d.data() as import('../types/wedding').CustomRsvpQuestion);
+  } catch (error) {
+    console.warn(`[Firestore] Failed to fetch questions for wedding ${weddingId}:`, error);
+    return [];
+  }
+}
+
+export async function deleteQuestionFromFirestore(weddingId: string, questionId: string): Promise<void> {
+  const path = `weddings/${weddingId}/questions/${questionId}`;
+  try {
+    await deleteDoc(doc(db, 'weddings', weddingId, 'questions', questionId));
+  } catch (error) {
+    console.warn(`[Firestore] Failed to delete question ${questionId}:`, error);
+  }
+}
+
 /**
  * Real-time listener for wedding RSVPs.
  * Automatically updates host dashboard immediately when any guest submits an RSVP.

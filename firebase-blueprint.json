@@ -113,6 +113,22 @@
       },
       "required": ["rsvpId", "guestId", "eventId", "weddingId", "attendanceStatus", "totalAttendees"]
     },
+    "CustomRsvpQuestion": {
+      "title": "CustomRsvpQuestion",
+      "description": "Host-defined custom question asked during guest RSVP confirmation",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string" },
+        "weddingId": { "type": "string" },
+        "eventId": { "type": "string" },
+        "questionText": { "type": "string", "maxLength": 300 },
+        "questionType": { "type": "string", "maxLength": 50 },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "isRequired": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["questionId", "weddingId", "questionText", "questionType", "isRequired", "order"]
+    },
     "InvitationToken": {
       "title": "InvitationToken",
       "description": "Public lookup record linking unique token to guest and wedding",
@@ -157,6 +173,10 @@
     "/weddings/{weddingId}/rsvps/{rsvpId}": {
       "schema": "RSVP",
       "description": "Guest RSVP records"
+    },
+    "/weddings/{weddingId}/questions/{questionId}": {
+      "schema": "CustomRsvpQuestion",
+      "description": "Custom questions asked to guests during RSVP"
     },
     "/invitation_tokens/{token}": {
       "schema": "InvitationToken",

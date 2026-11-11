@@ -20,7 +20,7 @@ export const GuestRsvpModal: React.FC<GuestRsvpModalProps> = ({
   event,
   onRsvpComplete,
 }) => {
-  const { currentWedding, events, guests, submitGuestRSVP, getGuestRSVP } = useWedding();
+  const { currentWedding, events, guests, customQuestions, submitGuestRSVP, getGuestRSVP } = useWedding();
 
   // If no specific guest is provided, default to first guest for demo/preview
   const activeGuest = guest || guests[0];
@@ -40,6 +40,7 @@ export const GuestRsvpModal: React.FC<GuestRsvpModalProps> = ({
     existingRsvp?.accompanyingGuests?.join(', ') ?? ''
   );
   const [message, setMessage] = useState<string>(existingRsvp?.additionalMessage ?? '');
+  const [customAnswers, setCustomAnswers] = useState<Record<string, any>>(existingRsvp?.customAnswers || {});
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
 
@@ -86,6 +87,7 @@ export const GuestRsvpModal: React.FC<GuestRsvpModalProps> = ({
           accompanyingGuests: accompanyingArray,
           dietaryRequirements: dietary,
           additionalMessage: message,
+          customAnswers,
         }
       );
 

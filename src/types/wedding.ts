@@ -84,6 +84,19 @@ export interface Guest {
   createdAt: string;
 }
 
+export type QuestionType = 'yes_no' | 'multiple_choice' | 'short_answer' | 'number';
+
+export interface CustomRsvpQuestion {
+  questionId: string;
+  weddingId: string;
+  eventId?: string; // undefined or '' means applies to all events
+  questionText: string;
+  questionType: QuestionType;
+  options?: string[]; // for multiple choice
+  isRequired: boolean;
+  order: number;
+}
+
 export interface EventRSVP {
   rsvpId: string;
   guestId: string;
@@ -96,6 +109,7 @@ export interface EventRSVP {
   accompanyingGuests?: string[];
   dietaryRequirements?: string;
   additionalMessage?: string;
+  customAnswers?: Record<string, string | number | boolean>;
   submittedAt: string;
   updatedAt: string;
 }

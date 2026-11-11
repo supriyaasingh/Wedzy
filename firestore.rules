@@ -61,6 +61,12 @@ service cloud.firestore {
         allow create, update: if true;
         allow delete: if isSignedIn() && get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerId == request.auth.uid;
       }
+
+      // Custom Questions Subcollection (Guests can read to answer, host can manage)
+      match /questions/{questionId} {
+        allow read: if true;
+        allow write: if isSignedIn() && get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerId == request.auth.uid;
+      }
     }
 
     // Direct token lookup index (Zero-friction invitation access without exposing full guest roster)

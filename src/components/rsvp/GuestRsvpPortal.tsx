@@ -69,6 +69,7 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
     guests,
     invitations,
     rsvps,
+    customQuestions,
     getGuestByToken,
     submitMultiEventRSVP,
   } = useWedding();
@@ -94,7 +95,7 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
   const activeThemeId = activeWedding.theme || 'royal_maroon';
   const theme = WEDDING_THEMES[activeThemeId] || WEDDING_THEMES.royal_maroon;
 
-  // Phone lookup state for guests without direct token
+  // Phone / Invitation code lookup state for guests without direct token
   const [phoneLookup, setPhoneLookup] = useState('');
   const [lookupError, setLookupError] = useState('');
   const [selectedGuestOverride, setSelectedGuestOverride] = useState<Guest | null>(null);
@@ -103,6 +104,7 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
 
   // Draft responses for each event
   const [responses, setResponses] = useState<Record<string, EventResponseDraft>>({});
+  const [customAnswersByEvent, setCustomAnswersByEvent] = useState<Record<string, Record<string, any>>>({});
   const [globalBlessing, setGlobalBlessing] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -119,11 +121,12 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
     return today > deadlineDate;
   }, [activeWedding.rsvpDeadline]);
 
-  // Initialize draft responses from existing RSVPs or defaults
+  // Initialize draft responses and custom answers from existing RSVPs or defaults
   useEffect(() => {
     if (!effectiveGuest) return;
 
     const initialResponses: Record<string, EventResponseDraft> = {};
+    const initialAnswers: Record<string, Record<string, any>> = {};
     let foundAnyRsvp = false;
 
     events.forEach((ev) => {
@@ -141,6 +144,9 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
           dietaryRequirements: existingRsvp.dietaryRequirements || DIETARY_OPTIONS[2].label,
           accompanyingGuests: existingRsvp.accompanyingGuests?.join(', ') || '',
         };
+        if (existingRsvp.customAnswers) {
+          initialAnswers[ev.eventId] = existingRsvp.customAnswers;
+        }
         if (existingRsvp.additionalMessage && !globalBlessing) {
           setGlobalBlessing(existingRsvp.additionalMessage);
         }
@@ -161,20 +167,30 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
     });
 
     setResponses(initialResponses);
+    setCustomAnswersByEvent(initialAnswers);
     if (foundAnyRsvp) {
       setIsSubmitted(true);
     }
   }, [effectiveGuest, events, rsvps]);
 
-  // Handle phone lookup
+  // Handle phone or code lookup (Requirement 8)
   const handleLookupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLookupError('');
-    const cleanInput = phoneLookup.replace(/[^0-9]/g, '');
+    const cleanDigits = phoneLookup.replace(/[^0-9]/g, '');
+    const cleanCode = phoneLookup.trim();
 
-    const found = guests.find((g) => {
+    // Privacy safeguard: Only search within the active wedding context
+    const scopedGuests = guests.filter((g) => g.weddingId === activeWedding.weddingId);
+
+    const found = scopedGuests.find((g) => {
       const cleanGuestPhone = g.phone.replace(/[^0-9]/g, '');
-      return cleanGuestPhone.endsWith(cleanInput) || cleanGuestPhone === cleanInput;
+      const inv = invitations.find((i) => i.guestId === g.guestId);
+
+      const phoneMatches = cleanDigits.length >= 6 && (cleanGuestPhone.endsWith(cleanDigits) || cleanGuestPhone === cleanDigits);
+      const codeMatches = inv && (inv.uniqueToken === cleanCode || inv.uniqueToken.endsWith(cleanCode));
+
+      return phoneMatches || codeMatches;
     });
 
     if (found) {
@@ -182,7 +198,7 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
       setIsSubmitted(false);
       setIsEditing(true);
     } else {
-      setLookupError('Could not find an invitation with this phone number. Please check with the wedding hosts.');
+      setLookupError('We could not find an invitation for this phone number. Please check the number or contact the wedding hosts.');
     }
   };
 
@@ -247,6 +263,16 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
     }));
   };
 
+  const updateCustomAnswer = (eventId: string, questionId: string, value: any) => {
+    setCustomAnswersByEvent((prev) => ({
+      ...prev,
+      [eventId]: {
+        ...(prev[eventId] || {}),
+        [questionId]: value,
+      },
+    }));
+  };
+
   // Submit all responses
   const handleSubmitAll = (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,6 +310,7 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
         dietaryRequirements: r.attendanceStatus === 'attending' ? r.dietaryRequirements : '',
         accompanyingGuests: accompanyingArray,
         additionalMessage: globalBlessing,
+        customAnswers: customAnswersByEvent[ev.eventId] || {},
       };
     });
 
@@ -586,6 +613,19 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
                         <div className="text-[11px] text-[#5C4D43] mt-0.5">
                           {ev.venue} {ev.dressCode ? `· Dress Code: ${ev.dressCode}` : ''}
                         </div>
+                        {/* Display custom answers if answered */}
+                        {customAnswersByEvent[ev.eventId] && Object.keys(customAnswersByEvent[ev.eventId]).length > 0 && (
+                          <div className="mt-1.5 flex flex-wrap gap-1.5 text-[10px]">
+                            {Object.entries(customAnswersByEvent[ev.eventId]).map(([qId, val]) => {
+                              const q = customQuestions.find((item) => item.questionId === qId);
+                              return (
+                                <span key={qId} className="bg-[#FAF0D4] text-[#800020] px-2 py-0.5 rounded border border-[#E5C378]">
+                                  {q ? q.questionText.slice(0, 30) : 'Detail'}: <strong>{String(val)}</strong>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
 
                       <div className="text-right shrink-0">
@@ -886,6 +926,94 @@ export const GuestRsvpPortal: React.FC<GuestRsvpPortalProps> = ({
                             className="w-full px-3 py-2 bg-white border border-[#E5C378] rounded-lg text-xs focus:outline-hidden focus:border-[#800020]"
                           />
                         </div>
+
+                        {/* Custom Questions for this Ceremony */}
+                        {(() => {
+                          const eventQuestions = customQuestions.filter(
+                            (q) => q.weddingId === activeWedding.weddingId && (!q.eventId || q.eventId === '' || q.eventId === ev.eventId)
+                          );
+                          if (eventQuestions.length === 0) return null;
+
+                          return (
+                            <div className="pt-3 border-t border-[#E5C378]/50 space-y-3">
+                              <span className="text-[11px] font-bold text-[#800020] uppercase tracking-wider block">
+                                Additional Details for {ev.eventName}:
+                              </span>
+                              {eventQuestions.map((q) => {
+                                const currentAns = customAnswersByEvent[ev.eventId]?.[q.questionId];
+
+                                return (
+                                  <div key={q.questionId} className="space-y-1 bg-[#FAF7F2] p-2.5 rounded-lg border border-[#E5C378]/40">
+                                    <label className="block font-bold text-[#3D291F]">
+                                      {q.questionText} {q.isRequired && <span className="text-rose-600">*</span>}
+                                    </label>
+
+                                    {q.questionType === 'yes_no' && (
+                                      <div className="flex gap-4 pt-0.5">
+                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                          <input
+                                            type="radio"
+                                            name={`${ev.eventId}_${q.questionId}`}
+                                            value="Yes"
+                                            checked={currentAns === 'Yes' || currentAns === true}
+                                            onChange={() => updateCustomAnswer(ev.eventId, q.questionId, 'Yes')}
+                                            className="accent-[#800020]"
+                                          />
+                                          <span>Yes</span>
+                                        </label>
+                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                          <input
+                                            type="radio"
+                                            name={`${ev.eventId}_${q.questionId}`}
+                                            value="No"
+                                            checked={currentAns === 'No' || currentAns === false}
+                                            onChange={() => updateCustomAnswer(ev.eventId, q.questionId, 'No')}
+                                            className="accent-[#800020]"
+                                          />
+                                          <span>No</span>
+                                        </label>
+                                      </div>
+                                    )}
+
+                                    {q.questionType === 'multiple_choice' && (
+                                      <select
+                                        value={currentAns || (q.options ? q.options[0] : '')}
+                                        onChange={(e) => updateCustomAnswer(ev.eventId, q.questionId, e.target.value)}
+                                        className="w-full p-2 bg-white border border-[#E5C378] rounded-md text-xs focus:outline-hidden"
+                                      >
+                                        {q.options?.map((opt, i) => (
+                                          <option key={i} value={opt}>
+                                            {opt}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    )}
+
+                                    {q.questionType === 'short_answer' && (
+                                      <input
+                                        type="text"
+                                        placeholder="Your answer..."
+                                        value={currentAns || ''}
+                                        onChange={(e) => updateCustomAnswer(ev.eventId, q.questionId, e.target.value)}
+                                        className="w-full px-2.5 py-1.5 bg-white border border-[#E5C378] rounded-md text-xs focus:outline-hidden"
+                                      />
+                                    )}
+
+                                    {q.questionType === 'number' && (
+                                      <input
+                                        type="number"
+                                        min={0}
+                                        value={currentAns !== undefined ? currentAns : 0}
+                                        onChange={(e) => updateCustomAnswer(ev.eventId, q.questionId, Number(e.target.value))}
+                                        className="w-24 px-2.5 py-1.5 bg-white border border-[#E5C378] rounded-md text-xs font-mono focus:outline-hidden"
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
 
                       </div>
                     ) : (

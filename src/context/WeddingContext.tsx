@@ -10,6 +10,8 @@ import {
   CateringPlan,
   SeatingTable,
   GuestCheckIn,
+  CustomRsvpQuestion,
+  QuestionType,
 } from '../types/wedding';
 import {
   DEMO_USER,
@@ -108,6 +110,14 @@ interface WeddingContextType {
   generateReminderWhatsAppLink: (guest: Guest, customReminderTemplate?: string) => string;
   validateGuestWhatsAppNumber: (guest: Guest) => { cleanNumber: string; isValid: boolean; formattedDisplay: string; error?: string };
 
+  // Custom RSVP Questions
+  customQuestions: CustomRsvpQuestion[];
+  addCustomQuestion: (question: Omit<CustomRsvpQuestion, 'questionId' | 'weddingId' | 'order'>) => CustomRsvpQuestion;
+  updateCustomQuestion: (questionId: string, data: Partial<CustomRsvpQuestion>) => void;
+  deleteCustomQuestion: (questionId: string) => void;
+  reorderCustomQuestions: (orderedIds: string[]) => void;
+  getQuestionsForEvent: (eventId?: string) => CustomRsvpQuestion[];
+
   // RSVPs
   getGuestRSVP: (guestId: string, eventId?: string) => EventRSVP | undefined;
   submitGuestRSVP: (
@@ -120,6 +130,7 @@ interface WeddingContextType {
       accompanyingGuests?: string[];
       dietaryRequirements?: string;
       additionalMessage?: string;
+      customAnswers?: Record<string, string | number | boolean>;
     }
   ) => EventRSVP;
   submitMultiEventRSVP: (
@@ -132,6 +143,7 @@ interface WeddingContextType {
       dietaryRequirements?: string;
       accompanyingGuests?: string[];
       additionalMessage?: string;
+      customAnswers?: Record<string, string | number | boolean>;
     }>
   ) => void;
 
@@ -165,7 +177,45 @@ const STORAGE_KEYS = {
   RSVPS: 'weddingguest_rsvps_v1',
   BUFFER: 'weddingguest_buffer_v1',
   MANUAL_ADJ: 'weddingguest_manual_adj_v1',
+  QUESTIONS: 'weddingguest_questions_v1',
 };
+
+const DEFAULT_CUSTOM_QUESTIONS: CustomRsvpQuestion[] = [
+  {
+    questionId: 'q_hotel_stay',
+    weddingId: DEMO_WEDDING.weddingId,
+    questionText: 'Will you and your family require hotel accommodation?',
+    questionType: 'yes_no',
+    isRequired: false,
+    order: 1,
+  },
+  {
+    questionId: 'q_transport',
+    weddingId: DEMO_WEDDING.weddingId,
+    questionText: 'Do you need transport pickup from the airport or railway station?',
+    questionType: 'multiple_choice',
+    options: ['Airport Pickup Needed', 'Railway Station Pickup', 'Self-Arranged Vehicle'],
+    isRequired: false,
+    order: 2,
+  },
+  {
+    questionId: 'q_sangeet_song',
+    weddingId: DEMO_WEDDING.weddingId,
+    eventId: 'evt_mehendi_sangeet',
+    questionText: 'Any favorite Bollywood song you want on the Sangeet playlist?',
+    questionType: 'short_answer',
+    isRequired: false,
+    order: 3,
+  },
+  {
+    questionId: 'q_child_seats',
+    weddingId: DEMO_WEDDING.weddingId,
+    questionText: 'How many young children in your group will need high chairs?',
+    questionType: 'number',
+    isRequired: false,
+    order: 4,
+  },
+];
 
 const WeddingContext = createContext<WeddingContextType | undefined>(undefined);
 
@@ -313,6 +363,16 @@ export const WeddingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   });
 
+  // 8. Custom RSVP Questions
+  const [customQuestions, setCustomQuestions] = useState<CustomRsvpQuestion[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.QUESTIONS);
+      return saved ? JSON.parse(saved) : DEFAULT_CUSTOM_QUESTIONS;
+    } catch {
+      return DEFAULT_CUSTOM_QUESTIONS;
+    }
+  });
+
   // Persistence Effects
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(currentUser));
@@ -349,6 +409,62 @@ export const WeddingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.MANUAL_ADJ, foodManualAdjustment.toString());
   }, [foodManualAdjustment]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(customQuestions));
+  }, [customQuestions]);
+
+  // Custom Questions Operations
+  const addCustomQuestion = (
+    questionData: Omit<CustomRsvpQuestion, 'questionId' | 'weddingId' | 'order'>
+  ): CustomRsvpQuestion => {
+    const questionId = `q_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const newQuestion: CustomRsvpQuestion = {
+      ...questionData,
+      questionId,
+      weddingId: currentWedding.weddingId,
+      order: customQuestions.length + 1,
+    };
+    setCustomQuestions((prev) => [...prev, newQuestion]);
+    return newQuestion;
+  };
+
+  const updateCustomQuestion = (questionId: string, data: Partial<CustomRsvpQuestion>) => {
+    setCustomQuestions((prev) =>
+      prev.map((q) => (q.questionId === questionId ? { ...q, ...data } : q))
+    );
+  };
+
+  const deleteCustomQuestion = (questionId: string) => {
+    setCustomQuestions((prev) => prev.filter((q) => q.questionId !== questionId));
+  };
+
+  const reorderCustomQuestions = (orderedIds: string[]) => {
+    setCustomQuestions((prev) => {
+      const map = new Map(prev.map((q) => [q.questionId, q]));
+      const reordered: CustomRsvpQuestion[] = [];
+      orderedIds.forEach((id, idx) => {
+        const item = map.get(id);
+        if (item) {
+          reordered.push({ ...item, order: idx + 1 });
+        }
+      });
+      // Append any questions not explicitly in orderedIds
+      prev.forEach((q) => {
+        if (!orderedIds.includes(q.questionId)) {
+          reordered.push({ ...q, order: reordered.length + 1 });
+        }
+      });
+      return reordered;
+    });
+  };
+
+  const getQuestionsForEvent = (eventId?: string): CustomRsvpQuestion[] => {
+    return customQuestions
+      .filter((q) => q.weddingId === currentWedding.weddingId)
+      .filter((q) => !q.eventId || q.eventId === '' || q.eventId === eventId)
+      .sort((a, b) => a.order - b.order);
+  };
 
   // Food Planning Calculator Logic (Crucial Business Objective)
   const getEventFoodCalculation = (targetEventId?: string): FoodCalculations => {
@@ -1012,6 +1128,7 @@ With warm regards,
       accompanyingGuests?: string[];
       dietaryRequirements?: string;
       additionalMessage?: string;
+      customAnswers?: Record<string, string | number | boolean>;
     }
   ): EventRSVP => {
     const totalAttendees = attendanceStatus === 'attending' ? Math.max(1, adultCount + childCount) : 0;
@@ -1030,6 +1147,7 @@ With warm regards,
         accompanyingGuests: extraData?.accompanyingGuests || rsvps[existingIndex].accompanyingGuests,
         dietaryRequirements: extraData?.dietaryRequirements ?? rsvps[existingIndex].dietaryRequirements,
         additionalMessage: extraData?.additionalMessage ?? rsvps[existingIndex].additionalMessage,
+        customAnswers: extraData?.customAnswers || rsvps[existingIndex].customAnswers,
         updatedAt: now,
       };
       setRsvps((prev) => {
@@ -1050,6 +1168,7 @@ With warm regards,
         accompanyingGuests: extraData?.accompanyingGuests || [],
         dietaryRequirements: extraData?.dietaryRequirements || '',
         additionalMessage: extraData?.additionalMessage || '',
+        customAnswers: extraData?.customAnswers || {},
         submittedAt: now,
         updatedAt: now,
       };
@@ -1072,6 +1191,7 @@ With warm regards,
       dietaryRequirements?: string;
       accompanyingGuests?: string[];
       additionalMessage?: string;
+      customAnswers?: Record<string, string | number | boolean>;
     }>
   ) => {
     const now = new Date().toISOString();
@@ -1090,6 +1210,7 @@ With warm regards,
             accompanyingGuests: resp.accompanyingGuests || next[existingIdx].accompanyingGuests,
             dietaryRequirements: resp.dietaryRequirements ?? next[existingIdx].dietaryRequirements,
             additionalMessage: resp.additionalMessage ?? next[existingIdx].additionalMessage,
+            customAnswers: resp.customAnswers || next[existingIdx].customAnswers,
             updatedAt: now,
           };
         } else {
@@ -1105,6 +1226,7 @@ With warm regards,
             accompanyingGuests: resp.accompanyingGuests || [],
             dietaryRequirements: resp.dietaryRequirements || '',
             additionalMessage: resp.additionalMessage || '',
+            customAnswers: resp.customAnswers || {},
             submittedAt: now,
             updatedAt: now,
           });
@@ -1125,6 +1247,7 @@ With warm regards,
     setGuests(DEMO_GUESTS);
     setInvitations(DEMO_INVITATIONS);
     setRsvps(DEMO_RSVPS);
+    setCustomQuestions(DEFAULT_CUSTOM_QUESTIONS);
     setFoodBufferPercentage(5);
     setFoodManualAdjustment(0);
     localStorage.clear();
@@ -1170,6 +1293,12 @@ With warm regards,
         generateWhatsAppLink,
         generateReminderWhatsAppLink,
         validateGuestWhatsAppNumber,
+        customQuestions,
+        addCustomQuestion,
+        updateCustomQuestion,
+        deleteCustomQuestion,
+        reorderCustomQuestions,
+        getQuestionsForEvent,
         getGuestRSVP,
         submitGuestRSVP,
         submitMultiEventRSVP,

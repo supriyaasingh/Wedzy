@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Users,
   CheckCircle2,
@@ -18,29 +18,50 @@ import {
   ExternalLink,
   Send,
   X,
+  FileText,
+  Armchair,
+  UserCheck,
+  ChevronDown,
+  Calendar,
+  Layers,
+  HelpCircle,
+  HeartHandshake,
+  ArrowRight,
 } from 'lucide-react';
 import { useWedding } from '../../context/WeddingContext';
 import { Guest, GuestCategory } from '../../types/wedding';
-import { DiyaIcon, SacredKalash, MarigoldGarland } from '../illustrations/IndianWeddingDecorations';
-import { InteractiveFoodCalculatorWidget } from '../landing/InteractiveFoodCalculatorWidget';
+import { DiyaIcon, SacredKalash, MandapArch } from '../illustrations/IndianWeddingDecorations';
 import { InvitationDesigner } from '../designer/InvitationDesigner';
 import { EventManager } from '../events/EventManager';
 import { MyWeddingsView } from '../wedding/MyWeddingsView';
 import { GuestManager } from '../guests/GuestManager';
 import { InvitationsHub } from '../invitations/InvitationsHub';
 import { AttendanceAnalyticsSection } from './AttendanceAnalyticsSection';
-import { PendingFollowUpSection } from './PendingFollowUpSection';
 import { AttendanceReportModal } from './AttendanceReportModal';
 import { CateringManager } from '../food/CateringManager';
 import { SeatingPlanner } from '../seating/SeatingPlanner';
 import { DayOfCheckIn } from '../checkin/DayOfCheckIn';
-import { FileText, Armchair, UserCheck } from 'lucide-react';
+import { RsvpTrackingView } from '../rsvp/RsvpTrackingView';
+import { CustomQuestionsManager } from '../rsvp/CustomQuestionsManager';
 
 interface WeddingDashboardProps {
   onOpenCreateWizard: () => void;
   onOpenGuestRsvp: (guest: Guest) => void;
   onBackToHome: () => void;
 }
+
+type DashboardTab = 
+  | 'overview' 
+  | 'weddings' 
+  | 'guests' 
+  | 'invitations' 
+  | 'rsvps' 
+  | 'events' 
+  | 'designer' 
+  | 'food' 
+  | 'seating' 
+  | 'checkin' 
+  | 'questions';
 
 export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
   onOpenCreateWizard,
@@ -60,14 +81,11 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
     getEventFoodCalculation,
     addGuest,
     generateWhatsAppLink,
-    generateReminderWhatsAppLink,
     updateInvitationStatus,
   } = useWedding();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'designer' | 'guests' | 'invitations' | 'food' | 'seating' | 'checkin' | 'weddings'>('overview');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
+  const [isMoreToolsOpen, setIsMoreToolsOpen] = useState(false);
 
   // Add Guest Modal State
   const [isAddGuestModalOpen, setIsAddGuestModalOpen] = useState(false);
@@ -78,32 +96,33 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
   const [newGuestCategory, setNewGuestCategory] = useState<GuestCategory>('Friends');
   const [newGuestExpected, setNewGuestExpected] = useState(2);
 
+  // Scoped Guests & Stats for active wedding
+  const weddingGuests = useMemo(() => {
+    return guests.filter((g) => g.weddingId === currentWedding.weddingId);
+  }, [guests, currentWedding.weddingId]);
+
   const selectedEvent = events.find((e) => e.eventId === selectedEventId) || events[0];
   const foodStats = getEventFoodCalculation(selectedEventId);
 
-  // Filtered Guests
-  const filteredGuests = guests.filter((g) => {
-    const matchesSearch =
-      g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      g.phone.includes(searchQuery) ||
-      (g.familyName && g.familyName.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Setup Progress Calculation (Requirement 2 & 1)
+  const setupProgress = useMemo(() => {
+    const hasWedding = Boolean(currentWedding.brideName && currentWedding.groomName);
+    const hasGuests = weddingGuests.length > 0;
+    const hasSentInvites = invitations.some((i) => i.sharingStatus !== 'not_shared');
+    const hasRsvps = rsvps.some((r) => r.weddingId === currentWedding.weddingId);
 
-    const matchesCategory = categoryFilter === 'all' || g.category === categoryFilter;
+    const completedCount = [hasWedding, hasGuests, hasSentInvites, hasRsvps].filter(Boolean).length;
+    const percentage = Math.round((completedCount / 4) * 100);
 
-    const inv = invitations.find((i) => i.guestId === g.guestId);
-    const rsvp = rsvps.find((r) => r.guestId === g.guestId && r.eventId === selectedEventId);
-
-    let status = 'pending';
-    if (rsvp) {
-      status = rsvp.attendanceStatus; // 'attending' or 'declined'
-    } else if (inv?.sharingStatus === 'not_shared') {
-      status = 'not_shared';
-    }
-
-    const matchesStatus = statusFilter === 'all' || status === statusFilter;
-
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+    return {
+      hasWedding,
+      hasGuests,
+      hasSentInvites,
+      hasRsvps,
+      completedCount,
+      percentage,
+    };
+  }, [currentWedding, weddingGuests, invitations, rsvps]);
 
   const handleAddGuestSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,22 +150,18 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
     window.open(link, '_blank');
   };
 
-  const handleOpenReminderWhatsApp = (guest: Guest) => {
-    updateInvitationStatus(guest.guestId, 'whatsapp_opened');
-    const link = generateReminderWhatsAppLink(guest);
-    window.open(link, '_blank');
-  };
+  const isMoreToolActive = ['food', 'seating', 'checkin', 'events', 'designer', 'questions'].includes(activeTab);
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] pb-16">
       
-      {/* Dashboard Top Auspicious Banner */}
+      {/* Top Auspicious Banner */}
       <div className="bg-[#800020] text-white border-b-2 border-[#D4AF37] shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl overflow-hidden border border-[#E5C378] flex items-center justify-center shrink-0 shadow-sm bg-[#360309]">
+              <div className="w-12 h-12 rounded-2xl overflow-hidden border border-[#E5C378] flex items-center justify-center shrink-0 shadow-sm bg-[#360309]">
                 <img
                   src="/assets/wedding_guest_logo_192.png"
                   alt="WeddingGuest Logo"
@@ -155,7 +170,7 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#FDE68A] uppercase tracking-wider">
-                  <span>Host Dashboard</span>
+                  <span>Wedding Portal</span>
                   <span>·</span>
                   <span>{currentWedding.theme.replace('_', ' ')}</span>
                 </div>
@@ -171,37 +186,38 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
             <div className="flex items-center gap-2.5 shrink-0">
               <button
                 onClick={() => setIsReportModalOpen(true)}
-                className="px-3.5 py-1.5 text-xs font-semibold text-[#800020] bg-[#FAF0D4] hover:bg-[#F5E3B5] border border-[#E5C378] rounded-md transition-colors flex items-center gap-1.5 shadow-2xs"
+                className="px-3.5 py-1.5 text-xs font-semibold text-[#800020] bg-[#FAF0D4] hover:bg-[#F5E3B5] border border-[#E5C378] rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs"
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>Attendance Manifest</span>
+                <span>Manifest Report</span>
               </button>
               <button
                 onClick={onOpenCreateWizard}
-                className="px-3 py-1.5 text-xs font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-md transition-colors"
+                className="px-3.5 py-1.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-colors flex items-center gap-1.5"
               >
-                + New Wedding
+                <Sparkles className="w-3.5 h-3.5 text-[#FDE047]" />
+                <span>Setup Wizard</span>
               </button>
               <button
                 onClick={onBackToHome}
-                className="px-3 py-1.5 text-xs font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-md transition-colors"
+                className="px-3 py-1.5 text-xs font-semibold text-white/80 hover:text-white transition-colors"
               >
-                Landing Page
+                Home
               </button>
             </div>
 
           </div>
 
-          {/* Event Selector Tabs (Haldi, Mehendi, Wedding, Reception) */}
-          <div className="mt-5 pt-3 border-t border-white/15 flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="text-xs font-medium text-[#FDE68A] uppercase tracking-wider shrink-0 mr-1">
-              Select Ceremony:
+          {/* Ceremony Selector Pills */}
+          <div className="mt-4 pt-3 border-t border-white/15 flex items-center gap-2 overflow-x-auto pb-1">
+            <span className="text-[11px] font-medium text-[#FDE68A] uppercase tracking-wider shrink-0 mr-1">
+              Active Ceremony:
             </span>
             {events.map((ev, idx) => (
               <button
                 key={`${ev.eventId || 'evt'}_${idx}`}
                 onClick={() => setSelectedEventId(ev.eventId)}
-                className={`px-3 py-1 text-xs font-medium rounded-md whitespace-nowrap transition-all ${
+                className={`px-3 py-1 text-xs font-medium rounded-lg whitespace-nowrap transition-all ${
                   selectedEventId === ev.eventId
                     ? 'bg-[#FDE047] text-[#800020] font-bold shadow-xs'
                     : 'bg-white/10 text-white/90 hover:bg-white/20'
@@ -217,37 +233,193 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
-        {/* Navigation Tabs (Overview, Ceremonies, Invitation Studio, Guests, Food, My Weddings) */}
+        {/* ========================================================
+            CLEAN NAVIGATION BAR (Requirement 7)
+            Main: Home, My Weddings, Guests, Invitations, RSVPs
+            Secondary: "More Tools" dropdown
+            ======================================================== */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E5C378]/50 pb-3 mb-6 gap-3">
+          
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            {[
-              { id: 'overview', label: 'Real-Time Overview' },
-              { id: 'events', label: `Ceremonies (${events.length})` },
-              { id: 'designer', label: 'Invitation Studio' },
-              { id: 'guests', label: `Guest List (${guests.length})` },
-              { id: 'invitations', label: 'WhatsApp Invitations' },
-              { id: 'food', label: 'Food Planning' },
-              { id: 'seating', label: 'Seating Planner' },
-              { id: 'checkin', label: 'Day-of Check-In' },
-              { id: 'weddings', label: 'My Weddings' },
-            ].map((tab) => (
+            {/* 1. Home / Overview */}
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 ${
+                activeTab === 'overview'
+                  ? 'bg-[#800020] text-white shadow-xs'
+                  : 'text-[#5C4D43] hover:bg-[#FAF0D4] hover:text-[#800020]'
+              }`}
+            >
+              Home
+            </button>
+
+            {/* 2. My Weddings */}
+            <button
+              onClick={() => setActiveTab('weddings')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 ${
+                activeTab === 'weddings'
+                  ? 'bg-[#800020] text-white shadow-xs'
+                  : 'text-[#5C4D43] hover:bg-[#FAF0D4] hover:text-[#800020]'
+              }`}
+            >
+              My Weddings
+            </button>
+
+            {/* 3. Guests */}
+            <button
+              onClick={() => setActiveTab('guests')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 ${
+                activeTab === 'guests'
+                  ? 'bg-[#800020] text-white shadow-xs'
+                  : 'text-[#5C4D43] hover:bg-[#FAF0D4] hover:text-[#800020]'
+              }`}
+            >
+              Guests ({weddingGuests.length})
+            </button>
+
+            {/* 4. Invitations */}
+            <button
+              onClick={() => setActiveTab('invitations')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 ${
+                activeTab === 'invitations'
+                  ? 'bg-[#800020] text-white shadow-xs'
+                  : 'text-[#5C4D43] hover:bg-[#FAF0D4] hover:text-[#800020]'
+              }`}
+            >
+              Invitations (WhatsApp)
+            </button>
+
+            {/* 5. RSVPs */}
+            <button
+              onClick={() => setActiveTab('rsvps')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 ${
+                activeTab === 'rsvps'
+                  ? 'bg-[#800020] text-white shadow-xs'
+                  : 'text-[#5C4D43] hover:bg-[#FAF0D4] hover:text-[#800020]'
+              }`}
+            >
+              RSVPs ({rsvps.filter((r) => r.weddingId === currentWedding.weddingId).length})
+            </button>
+
+            {/* "More Tools" Dropdown Menu */}
+            <div className="relative">
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
-                  activeTab === tab.id
-                    ? 'bg-[#800020] text-white shadow-xs'
-                    : 'text-[#5C4D43] hover:bg-[#FAF0D4] hover:text-[#800020]'
+                onClick={() => setIsMoreToolsOpen(!isMoreToolsOpen)}
+                className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1 whitespace-nowrap shrink-0 border ${
+                  isMoreToolActive
+                    ? 'bg-[#FAF0D4] text-[#800020] border-[#D4AF37]'
+                    : 'bg-white text-[#5C4D43] border-[#E5C378]/60 hover:bg-[#FAF0D4]'
                 }`}
               >
-                {tab.label}
+                <Layers className="w-3.5 h-3.5 text-[#B45309]" />
+                <span>More Tools</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMoreToolsOpen ? 'rotate-180' : ''}`} />
               </button>
-            ))}
+
+              {isMoreToolsOpen && (
+                <div
+                  className="absolute left-0 mt-2 w-56 bg-white rounded-2xl border border-[#E5C378] shadow-xl p-2 z-40 space-y-1 text-xs animate-in fade-in duration-150"
+                  onMouseLeave={() => setIsMoreToolsOpen(false)}
+                >
+                  <button
+                    onClick={() => {
+                      setActiveTab('food');
+                      setIsMoreToolsOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-[#FAF0D4] hover:text-[#800020] ${
+                      activeTab === 'food' ? 'bg-[#FAF0D4] text-[#800020] font-bold' : 'text-[#4A3228]'
+                    }`}
+                  >
+                    <UtensilsCrossed className="w-3.5 h-3.5 text-[#800020]" />
+                    <span>Catering & Food Planner</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab('seating');
+                      setIsMoreToolsOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-[#FAF0D4] hover:text-[#800020] ${
+                      activeTab === 'seating' ? 'bg-[#FAF0D4] text-[#800020] font-bold' : 'text-[#4A3228]'
+                    }`}
+                  >
+                    <Armchair className="w-3.5 h-3.5 text-[#800020]" />
+                    <span>Seating Planner</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab('checkin');
+                      setIsMoreToolsOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-[#FAF0D4] hover:text-[#800020] ${
+                      activeTab === 'checkin' ? 'bg-[#FAF0D4] text-[#800020] font-bold' : 'text-[#4A3228]'
+                    }`}
+                  >
+                    <UserCheck className="w-3.5 h-3.5 text-[#800020]" />
+                    <span>Day-of QR Check-In</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab('events');
+                      setIsMoreToolsOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-[#FAF0D4] hover:text-[#800020] ${
+                      activeTab === 'events' ? 'bg-[#FAF0D4] text-[#800020] font-bold' : 'text-[#4A3228]'
+                    }`}
+                  >
+                    <Calendar className="w-3.5 h-3.5 text-[#800020]" />
+                    <span>Ceremonies Schedule</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab('designer');
+                      setIsMoreToolsOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-[#FAF0D4] hover:text-[#800020] ${
+                      activeTab === 'designer' ? 'bg-[#FAF0D4] text-[#800020] font-bold' : 'text-[#4A3228]'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#800020]" />
+                    <span>Invitation Studio</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab('questions');
+                      setIsMoreToolsOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-[#FAF0D4] hover:text-[#800020] ${
+                      activeTab === 'questions' ? 'bg-[#FAF0D4] text-[#800020] font-bold' : 'text-[#4A3228]'
+                    }`}
+                  >
+                    <HelpCircle className="w-3.5 h-3.5 text-[#800020]" />
+                    <span>Custom RSVP Questions</span>
+                  </button>
+
+                  <div className="pt-1 border-t border-gray-100">
+                    <button
+                      onClick={() => {
+                        setIsReportModalOpen(true);
+                        setIsMoreToolsOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-xl flex items-center gap-2 text-[#4A3228] hover:bg-[#FAF0D4] hover:text-[#800020]"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-[#800020]" />
+                      <span>Attendance Reports & Export</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
+          {/* Quick Add Guest Button */}
           <button
             onClick={() => setIsAddGuestModalOpen(true)}
-            className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-[#800020] to-[#990000] hover:from-[#6B081B] hover:to-[#800020] rounded-lg shadow-sm flex items-center gap-1.5"
+            className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-[#800020] to-[#990000] hover:from-[#6B081B] hover:to-[#800020] rounded-xl shadow-xs flex items-center gap-1.5 self-end sm:self-center"
           >
             <Plus className="w-3.5 h-3.5 text-[#FDE047]" />
             <span>Add Guest</span>
@@ -255,15 +427,192 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
         </div>
 
         {/* ========================================================
-            TAB 1: REAL-TIME OVERVIEW WITH REAL STATISTIC CARDS (Part 9, Section 20)
+            TAB 1: SIMPLIFIED MAIN USER EXPERIENCE (Requirement 1)
+            Focus on 4 Primary Actions & Clean Dashboard
             ======================================================== */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
             
-            {/* Live Statistic Cards Grid */}
+            {/* Setup Progress Indicator Card */}
+            <div className="p-5 bg-white rounded-2xl border border-[#E5C378]/70 shadow-xs space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#B45309]" />
+                    <h3 className="font-bold text-sm text-[#3D291F]">
+                      Wedding Setup Progress: {setupProgress.completedCount} of 4 steps completed ({setupProgress.percentage}%)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#6B5E55] mt-0.5">
+                    Follow the guided steps below to set up your celebration, invite your loved ones, and track exact food numbers.
+                  </p>
+                </div>
+                <button
+                  onClick={onOpenCreateWizard}
+                  className="px-3.5 py-1.5 text-xs font-bold text-[#800020] bg-[#FAF0D4] hover:bg-[#F5E3B5] border border-[#E5C378] rounded-xl self-start sm:self-auto shrink-0 transition-colors"
+                >
+                  Resume Guided Setup
+                </button>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full h-2.5 bg-[#FAF7F2] rounded-full overflow-hidden border border-[#E5C378]/50">
+                <div
+                  className="h-full bg-gradient-to-r from-[#800020] via-[#D4AF37] to-emerald-600 transition-all duration-500 rounded-full"
+                  style={{ width: `${Math.max(15, setupProgress.percentage)}%` }}
+                />
+              </div>
+
+              {/* Progress Step Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+                <div className={`p-2 rounded-lg border flex items-center gap-1.5 ${setupProgress.hasWedding ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">1. Wedding Created</span>
+                </div>
+                <div className={`p-2 rounded-lg border flex items-center gap-1.5 ${setupProgress.hasGuests ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">2. Guests Added ({weddingGuests.length})</span>
+                </div>
+                <div className={`p-2 rounded-lg border flex items-center gap-1.5 ${setupProgress.hasSentInvites ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">3. Invitations Ready</span>
+                </div>
+                <div className={`p-2 rounded-lg border flex items-center gap-1.5 ${setupProgress.hasRsvps ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">4. RSVPs Active</span>
+                </div>
+              </div>
+            </div>
+
+            {/* THE FOUR PRIMARY ACTION CARDS (Requirement 1) */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-serif-luxury text-lg font-bold text-[#800020]">
+                  Main Wedding Actions
+                </h3>
+                <span className="text-xs text-[#786C64]">Usable with zero technical knowledge</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                {/* Action Card 1: Create Your Wedding */}
+                <div
+                  onClick={onOpenCreateWizard}
+                  className="p-5 rounded-2xl bg-white border-2 border-[#E5C378]/80 hover:border-[#800020] shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div className="space-y-2.5">
+                    <div className="w-11 h-11 rounded-xl bg-[#FAF0D4] border border-[#E5C378] text-[#800020] flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <HeartHandshake className="w-6 h-6 text-[#800020]" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309] block">
+                        Action 1
+                      </span>
+                      <h4 className="font-bold text-base text-[#3D291F] group-hover:text-[#800020] transition-colors mt-0.5">
+                        Create Your Wedding
+                      </h4>
+                      <p className="text-xs text-[#6B5E55] mt-1 leading-relaxed">
+                        Bride & groom names, date, venue, theme, and celebration functions.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#F0E6D8] mt-4 flex items-center justify-between text-xs font-bold text-[#800020]">
+                    <span>Edit or setup details</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+
+                {/* Action Card 2: Add or Import Guests */}
+                <div
+                  onClick={() => setActiveTab('guests')}
+                  className="p-5 rounded-2xl bg-white border-2 border-[#E5C378]/80 hover:border-[#800020] shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div className="space-y-2.5">
+                    <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <Users className="w-6 h-6 text-blue-700" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-800 block">
+                        Action 2
+                      </span>
+                      <h4 className="font-bold text-base text-[#3D291F] group-hover:text-[#800020] transition-colors mt-0.5">
+                        Add or Import Guests
+                      </h4>
+                      <p className="text-xs text-[#6B5E55] mt-1 leading-relaxed">
+                        Add guests manually or import Excel/CSV files with live data preview.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#F0E6D8] mt-4 flex items-center justify-between text-xs font-bold text-[#800020]">
+                    <span>{weddingGuests.length} guests configured</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+
+                {/* Action Card 3: Create & Send Invitations */}
+                <div
+                  onClick={() => setActiveTab('invitations')}
+                  className="p-5 rounded-2xl bg-white border-2 border-[#E5C378]/80 hover:border-[#800020] shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div className="space-y-2.5">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <MessageCircle className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
+                        Action 3
+                      </span>
+                      <h4 className="font-bold text-base text-[#3D291F] group-hover:text-[#800020] transition-colors mt-0.5">
+                        Create & Send Invitations
+                      </h4>
+                      <p className="text-xs text-[#6B5E55] mt-1 leading-relaxed">
+                        1-click WhatsApp Click-to-Chat with personal links & unique QR codes.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#F0E6D8] mt-4 flex items-center justify-between text-xs font-bold text-[#800020]">
+                    <span>Send on WhatsApp</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+
+                {/* Action Card 4: Track RSVPs */}
+                <div
+                  onClick={() => setActiveTab('rsvps')}
+                  className="p-5 rounded-2xl bg-white border-2 border-[#E5C378]/80 hover:border-[#800020] shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div className="space-y-2.5">
+                    <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <CheckCircle2 className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                        Action 4
+                      </span>
+                      <h4 className="font-bold text-base text-[#3D291F] group-hover:text-[#800020] transition-colors mt-0.5">
+                        Track RSVPs
+                      </h4>
+                      <p className="text-xs text-[#6B5E55] mt-1 leading-relaxed">
+                        Real-time confirmed attendee counts, adults, children & reminders.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#F0E6D8] mt-4 flex items-center justify-between text-xs font-bold text-[#800020]">
+                    <span>{foodStats.confirmedAttendees} confirmed attendees</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Quick Summary KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
               
-              {/* Card 1: Confirmed Attendees */}
               <div className="p-4 rounded-xl bg-white border border-[#E5C378]/70 shadow-xs">
                 <span className="text-[11px] font-semibold text-[#8C7A70] uppercase tracking-wider block">
                   Confirmed Attendees
@@ -276,7 +625,6 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                 </div>
               </div>
 
-              {/* Card 2: Recommended Food Plates */}
               <div className="p-4 rounded-xl bg-gradient-to-br from-[#FAF0D4] to-[#FDF8EE] border-2 border-[#D4AF37] shadow-xs">
                 <span className="text-[11px] font-semibold text-[#800020] uppercase tracking-wider block flex items-center gap-1">
                   <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -287,11 +635,10 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                   <span className="text-xs font-normal text-[#800020] ml-1">plates</span>
                 </div>
                 <div className="text-[11px] text-[#B45309] font-medium mt-1">
-                  Includes {foodStats.bufferPercentage}% safety buffer
+                  {foodStats.bufferPercentage}% buffer for {selectedEvent.eventName}
                 </div>
               </div>
 
-              {/* Card 3: Confirmed Families */}
               <div className="p-4 rounded-xl bg-white border border-[#E5C378]/70 shadow-xs">
                 <span className="text-[11px] font-semibold text-[#8C7A70] uppercase tracking-wider block">
                   Confirmed Families
@@ -304,7 +651,6 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                 </div>
               </div>
 
-              {/* Card 4: Pending Families */}
               <div className="p-4 rounded-xl bg-white border border-[#E5C378]/70 shadow-xs">
                 <span className="text-[11px] font-semibold text-[#8C7A70] uppercase tracking-wider block">
                   Pending Responses
@@ -317,8 +663,7 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                 </div>
               </div>
 
-              {/* Card 5: Declined Families */}
-              <div className="p-4 rounded-xl bg-white border border-[#E5C378]/70 shadow-xs">
+              <div className="p-4 rounded-xl bg-white border border-[#E5C378]/70 shadow-xs col-span-2 sm:col-span-1">
                 <span className="text-[11px] font-semibold text-[#8C7A70] uppercase tracking-wider block">
                   Declined Families
                 </span>
@@ -326,41 +671,38 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                   {foodStats.declinedFamilies}
                 </div>
                 <div className="text-[11px] text-rose-800 mt-1">
-                  Excluded from food orders
+                  Excluded from catering orders
                 </div>
               </div>
 
             </div>
 
-            {/* Quick Action Strip & Food Wastage Insight */}
+            {/* Quick WhatsApp Inviter Widget & Food Calculation */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* Left: Food Waste Prevention Formula in action */}
-              <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-[#E5C378]/70 shadow-sm space-y-4">
+              <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-[#E5C378]/70 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <DiyaIcon className="w-5 h-5 text-[#800020]" />
                     <h3 className="font-serif-luxury text-lg font-bold text-[#800020]">
-                      Active Food Calculation: {selectedEvent.eventName}
+                      Food Calculation: {selectedEvent.eventName}
                     </h3>
                   </div>
-                  <span className="text-xs bg-[#FAF0D4] text-[#800020] px-2.5 py-1 rounded border border-[#E5C378] font-mono font-bold">
+                  <span className="text-xs bg-[#FAF0D4] text-[#800020] px-2.5 py-1 rounded-lg border border-[#E5C378] font-mono font-bold">
                     Buffer: {foodBufferPercentage}%
                   </span>
                 </div>
 
                 <p className="text-xs text-[#6B5E55] leading-relaxed">
-                  Only confirmed guests are factored into the catering requirement. The formula calculates:{' '}
-                  <strong className="text-[#3D291F]">
-                    ⌈{foodStats.confirmedAttendees} confirmed × (1 + {foodBufferPercentage}%)⌉ = {foodStats.recommendedPlates} plates.
-                  </strong>
+                  Only confirmed guests are factored into catering requirements: <strong className="text-[#3D291F]">⌈{foodStats.confirmedAttendees} confirmed × (1 + {foodBufferPercentage}%)⌉ = {foodStats.recommendedPlates} plates.</strong>
                 </p>
 
                 {/* Buffer Slider */}
-                <div className="p-4 bg-[#FAF7F2] rounded-lg border border-[#E5C378]/40">
+                <div className="p-4 bg-[#FAF7F2] rounded-xl border border-[#E5C378]/40">
                   <div className="flex justify-between items-center mb-1 text-xs font-semibold text-[#3D291F]">
-                    <span>Adjust Buffer Percentage:</span>
-                    <span className="font-mono text-[#800020]">{foodBufferPercentage}%</span>
+                    <span>Adjust Safety Buffer:</span>
+                    <span className="font-mono text-[#800020] font-bold">{foodBufferPercentage}%</span>
                   </div>
                   <input
                     type="range"
@@ -373,39 +715,44 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                   />
                   <div className="flex justify-between text-[10px] text-[#8C7A70] mt-1 font-mono">
                     <span>0% (Exact Count)</span>
-                    <span className="text-[#800020] font-bold">5% (Recommended for Indian Weddings)</span>
+                    <span className="text-[#800020] font-bold">5% (Recommended)</span>
                     <span>30%</span>
                   </div>
                 </div>
 
                 <div className="pt-2 flex items-center justify-between text-xs text-[#5C4D43] border-t border-[#F0E6D8]">
-                  <span>Total Families in Guest List: <strong className="text-[#3D291F]">{guests.length}</strong></span>
-                  <span>Ceremony Date: <strong className="text-[#800020]">{selectedEvent.eventDate}</strong></span>
+                  <span>Total Families in Guest List: <strong className="text-[#3D291F]">{weddingGuests.length}</strong></span>
+                  <button
+                    onClick={() => setActiveTab('food')}
+                    className="text-[#800020] font-bold hover:underline"
+                  >
+                    Open Full Catering Planner →
+                  </button>
                 </div>
               </div>
 
               {/* Right: Quick WhatsApp Guest Inviter Widget */}
-              <div className="lg:col-span-5 bg-gradient-to-br from-[#FAF0D4] via-[#FDF8EE] to-[#F5E3B5] p-6 rounded-xl border border-[#E5C378] shadow-sm flex flex-col justify-between">
+              <div className="lg:col-span-5 bg-gradient-to-br from-[#FAF0D4] via-[#FDF8EE] to-[#F5E3B5] p-6 rounded-2xl border border-[#E5C378] shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#075E54]">
                     <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                    <span>WhatsApp Invitation Engine</span>
+                    <span>Quick WhatsApp Inviter</span>
                   </div>
                   <h3 className="font-serif-luxury text-lg font-bold text-[#800020] mt-1">
-                    Send Invitations & Reminders
+                    Send Personalised Invitations
                   </h3>
-                  <p className="text-xs text-[#5C4D43] mt-1.5 leading-relaxed">
-                    Personalized links let guests respond with 1 tap. Responses update this dashboard in real time.
+                  <p className="text-xs text-[#5C4D43] mt-1 leading-relaxed">
+                    Click-to-chat opens WhatsApp with each guest's name and personal link filled in.
                   </p>
 
                   <div className="mt-4 space-y-2">
-                    {guests.slice(0, 3).map((g) => {
+                    {weddingGuests.slice(0, 3).map((g) => {
                       const inv = invitations.find((i) => i.guestId === g.guestId);
                       const rsvp = rsvps.find((r) => r.guestId === g.guestId && r.eventId === selectedEventId);
                       return (
                         <div
                           key={g.guestId}
-                          className="p-2.5 bg-white rounded-lg border border-[#E5C378]/60 flex items-center justify-between gap-2 text-xs"
+                          className="p-2.5 bg-white rounded-xl border border-[#E5C378]/60 flex items-center justify-between gap-2 text-xs"
                         >
                           <div>
                             <span className="font-bold text-[#3D291F] block">{g.name}</span>
@@ -415,13 +762,13 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                                   ? `✓ Confirmed (${rsvp.totalAttendees})`
                                   : '✕ Declined'
                                 : inv?.sharingStatus === 'whatsapp_opened'
-                                ? 'WhatsApp Opened'
-                                : 'Pending Invite'}
+                                ? 'Opened'
+                                : 'Ready to Send'}
                             </span>
                           </div>
                           <button
                             onClick={() => handleOpenWhatsApp(g)}
-                            className="px-2.5 py-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded flex items-center gap-1"
+                            className="px-2.5 py-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg flex items-center gap-1"
                           >
                             <Send className="w-3 h-3 text-[#25D366]" />
                             <span>Send</span>
@@ -434,34 +781,31 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
 
                 <div className="mt-4 pt-3 border-t border-[#E5C378]/40 flex justify-between items-center text-xs">
                   <button
-                    onClick={() => setActiveTab('guests')}
+                    onClick={() => setActiveTab('invitations')}
                     className="text-[#800020] font-bold hover:underline flex items-center gap-1"
                   >
-                    <span>View all {guests.length} guests</span>
+                    <span>View All Invitations</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setIsAddGuestModalOpen(true)}
-                    className="text-xs font-semibold text-[#800020] bg-white px-2.5 py-1 rounded border border-[#E5C378]"
+                    className="text-xs font-semibold text-[#800020] bg-white px-2.5 py-1 rounded-lg border border-[#E5C378]"
                   >
-                    + Add New Guest
+                    + Add Guest
                   </button>
                 </div>
               </div>
 
             </div>
 
-            {/* Live Visual Attendance Distribution, Adult vs Child, and Dietary Breakdown (Part 9, Section 20) */}
+            {/* Attendance Analytics & Visual Distribution */}
             <AttendanceAnalyticsSection onSelectEvent={(id) => setSelectedEventId(id)} />
-
-            {/* Pending Guest Follow-up Command Center */}
-            <PendingFollowUpSection />
 
           </div>
         )}
 
         {/* ========================================================
-            TAB: GUEST LIST & FAMILY-WISE MANAGEMENT (Part 6)
+            TAB 2: GUEST LIST & FAMILY-WISE MANAGEMENT
             ======================================================== */}
         {activeTab === 'guests' && (
           <GuestManager
@@ -471,49 +815,24 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
         )}
 
         {/* ========================================================
-            TAB: WHATSAPP INVITATIONS HUB & DISPATCH TRACKER (Part 7)
+            TAB 3: WHATSAPP INVITATIONS HUB & DISPATCH TRACKER
             ======================================================== */}
         {activeTab === 'invitations' && (
           <InvitationsHub onOpenGuestRsvp={onOpenGuestRsvp} />
         )}
 
         {/* ========================================================
-            TAB: WEDDING CEREMONIES / EVENT MANAGER
+            TAB 4: SIMPLIFIED RSVP TRACKING (Requirement 6)
             ======================================================== */}
-        {activeTab === 'events' && (
-          <EventManager />
+        {activeTab === 'rsvps' && (
+          <RsvpTrackingView
+            onOpenGuestRsvp={onOpenGuestRsvp}
+            onOpenCustomQuestions={() => setActiveTab('questions')}
+          />
         )}
 
         {/* ========================================================
-            TAB: INVITATION DESIGNER & QR STUDIO
-            ======================================================== */}
-        {activeTab === 'designer' && (
-          <InvitationDesigner onBackToDashboard={() => setActiveTab('overview')} />
-        )}
-
-        {/* ========================================================
-            TAB: FOOD PLANNING & CATERING OPERATIONS (Part 8, 10)
-            ======================================================== */}
-        {activeTab === 'food' && (
-          <CateringManager />
-        )}
-
-        {/* ========================================================
-            TAB: SEATING PLANNER (Part 9)
-            ======================================================== */}
-        {activeTab === 'seating' && (
-          <SeatingPlanner />
-        )}
-
-        {/* ========================================================
-            TAB: DAY-OF GUEST CHECK-IN & DOOR ADMISSION (Part 9)
-            ======================================================== */}
-        {activeTab === 'checkin' && (
-          <DayOfCheckIn />
-        )}
-
-        {/* ========================================================
-            TAB: MY WEDDINGS PORTFOLIO
+            TAB 5: MY WEDDINGS PORTFOLIO
             ======================================================== */}
         {activeTab === 'weddings' && (
           <MyWeddingsView
@@ -522,12 +841,54 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
           />
         )}
 
+        {/* ========================================================
+            MORE TOOLS: CATERING & FOOD PLANNER
+            ======================================================== */}
+        {activeTab === 'food' && (
+          <CateringManager />
+        )}
+
+        {/* ========================================================
+            MORE TOOLS: SEATING PLANNER
+            ======================================================== */}
+        {activeTab === 'seating' && (
+          <SeatingPlanner />
+        )}
+
+        {/* ========================================================
+            MORE TOOLS: DAY-OF CHECK-IN
+            ======================================================== */}
+        {activeTab === 'checkin' && (
+          <DayOfCheckIn />
+        )}
+
+        {/* ========================================================
+            MORE TOOLS: CEREMONIES SCHEDULE
+            ======================================================== */}
+        {activeTab === 'events' && (
+          <EventManager />
+        )}
+
+        {/* ========================================================
+            MORE TOOLS: INVITATION STUDIO
+            ======================================================== */}
+        {activeTab === 'designer' && (
+          <InvitationDesigner onBackToDashboard={() => setActiveTab('overview')} />
+        )}
+
+        {/* ========================================================
+            MORE TOOLS: CUSTOM RSVP QUESTIONS (Requirement 4)
+            ======================================================== */}
+        {activeTab === 'questions' && (
+          <CustomQuestionsManager onClose={() => setActiveTab('overview')} />
+        )}
+
       </div>
 
       {/* Add Guest Modal */}
       {isAddGuestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-[#FAF7F2] rounded-xl border-2 border-[#E5C378] shadow-2xl p-6 w-full max-w-md relative">
+          <div className="bg-[#FAF7F2] rounded-2xl border-2 border-[#E5C378] shadow-2xl p-6 w-full max-w-md relative">
             <button
               onClick={() => setIsAddGuestModalOpen(false)}
               className="absolute top-4 right-4 p-1 text-[#6B5E55] hover:text-[#800020]"
@@ -546,14 +907,14 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                   placeholder="e.g. Vikram Singhania"
                   value={newGuestName}
                   onChange={(e) => setNewGuestName(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-[#E5C378] rounded-md focus:outline-hidden"
+                  className="w-full px-3 py-2 bg-white border border-[#E5C378] rounded-xl focus:outline-hidden"
                 />
               </div>
 
               <div>
                 <label className="block font-semibold text-[#3D291F] mb-1">WhatsApp Phone Number *</label>
                 <div className="flex gap-2">
-                  <span className="px-2.5 py-2 bg-[#FAF0D4] border border-[#E5C378] rounded-md font-mono font-bold text-[#800020]">
+                  <span className="px-2.5 py-2 bg-[#FAF0D4] border border-[#E5C378] rounded-xl font-mono font-bold text-[#800020]">
                     +91
                   </span>
                   <input
@@ -562,7 +923,7 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                     placeholder="98765 43210"
                     value={newGuestPhone}
                     onChange={(e) => setNewGuestPhone(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-white border border-[#E5C378] rounded-md focus:outline-hidden"
+                    className="flex-1 px-3 py-2 bg-white border border-[#E5C378] rounded-xl focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -574,7 +935,7 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                   placeholder="e.g. Singhania Family"
                   value={newGuestFamily}
                   onChange={(e) => setNewGuestFamily(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-[#E5C378] rounded-md focus:outline-hidden"
+                  className="w-full px-3 py-2 bg-white border border-[#E5C378] rounded-xl focus:outline-hidden"
                 />
               </div>
 
@@ -584,7 +945,7 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                   <select
                     value={newGuestCategory}
                     onChange={(e) => setNewGuestCategory(e.target.value as GuestCategory)}
-                    className="w-full px-2.5 py-2 bg-white border border-[#E5C378] rounded-md focus:outline-hidden"
+                    className="w-full px-2.5 py-2 bg-white border border-[#E5C378] rounded-xl focus:outline-hidden"
                   >
                     <option value="Bride's family">Bride's Family</option>
                     <option value="Groom's family">Groom's Family</option>
@@ -601,10 +962,10 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
                   <input
                     type="number"
                     min="1"
-                    max="10"
+                    max="15"
                     value={newGuestExpected}
                     onChange={(e) => setNewGuestExpected(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-[#E5C378] rounded-md focus:outline-hidden font-mono"
+                    className="w-full px-3 py-2 bg-white border border-[#E5C378] rounded-xl focus:outline-hidden font-mono"
                   />
                 </div>
               </div>
@@ -612,7 +973,7 @@ export const WeddingDashboard: React.FC<WeddingDashboardProps> = ({
               <div className="pt-3">
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-[#800020] hover:bg-[#6B081B] text-white font-bold rounded-lg shadow-sm"
+                  className="w-full py-2.5 bg-[#800020] hover:bg-[#6B081B] text-white font-bold rounded-xl shadow-xs"
                 >
                   Save Guest & Generate WhatsApp Link
                 </button>

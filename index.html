@@ -28,6 +28,19 @@
       href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@500;600;700;800&family=Great+Vibes&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rozha+One&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // Suppress transient Vite HMR WebSocket connection notices in embedded iframe preview
+      window.addEventListener('error', function (event) {
+        if (event.message && (event.message.includes('WebSocket') || event.message.includes('ws'))) {
+          event.stopImmediatePropagation();
+        }
+      });
+      window.addEventListener('unhandledrejection', function (event) {
+        if (event.reason && String(event.reason).includes('WebSocket')) {
+          event.stopImmediatePropagation();
+        }
+      });
+    </script>
   </head>
   <body class="bg-[#FAF7F2] text-[#2C1810] antialiased selection:bg-[#F59E0B]/30 selection:text-[#800020]">
     <div id="root"></div>

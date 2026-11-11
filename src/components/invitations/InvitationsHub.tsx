@@ -314,6 +314,16 @@ export const InvitationsHub: React.FC<InvitationsHubProps> = ({ onOpenGuestRsvp 
 
       </div>
 
+      {/* Click-to-Chat Transparency Banner (Requirement 5) */}
+      <div className="p-3.5 bg-emerald-50/90 rounded-2xl border border-emerald-300 flex items-start sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5">
+          <MessageCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+          <p className="text-emerald-950 leading-relaxed">
+            <strong>Click-to-Chat WhatsApp Sending:</strong> Clicking <strong>WhatsApp</strong> opens the chat with your guest's phone number and personalised invitation link filled in. You simply review and press <strong>Send</strong> inside WhatsApp. No automated sending occurs without your confirmation.
+          </p>
+        </div>
+      </div>
+
       {/* Filter and Search Bar */}
       <div className="p-4 rounded-xl bg-white border border-[#E5C378]/70 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
